@@ -14,209 +14,212 @@ import * as Opts from './internal/request-options';
 import * as qs from './internal/qs';
 import { VERSION } from './version';
 import * as Errors from './core/error';
+import * as Pagination from './core/pagination';
+import {
+  AbstractPage,
+  type ConversationCursorPageParams,
+  ConversationCursorPageResponse,
+  type CursorPageParams,
+  CursorPageResponse,
+  PageResponse,
+} from './core/pagination';
 import * as Uploads from './core/uploads';
 import * as API from './resources/index';
 import { APIPromise } from './core/api-promise';
 import {
-  AssistantCreateParams,
-  AssistantDeleteResponse,
-  AssistantListParams,
-  AssistantListResponse,
-  AssistantObject,
-  AssistantSupportedModels,
-  AssistantToolsCode,
-  AssistantToolsFileSearch,
-  AssistantToolsFunction,
-  AssistantUpdateParams,
-  Assistants,
-  FileSearchRanker,
-  FunctionObject,
-  ReasoningEffort,
-} from './resources/assistants';
-import { Batch, BatchCreateParams, BatchListParams, BatchListResponse, Batches } from './resources/batches';
+  Batch,
+  BatchCreateParams,
+  BatchError,
+  BatchListParams,
+  BatchRequestCounts,
+  BatchUsage,
+  Batches,
+  BatchesPage,
+} from './resources/batches';
 import {
-  ChatCompletionStreamOptions,
+  Completion,
+  CompletionChoice,
   CompletionCreateParams,
-  CompletionCreateResponse,
+  CompletionCreateParamsNonStreaming,
+  CompletionCreateParamsStreaming,
+  CompletionUsage,
   Completions,
-  StopConfiguration,
 } from './resources/completions';
-import { EmbeddingCreateParams, EmbeddingCreateResponse, Embeddings } from './resources/embeddings';
 import {
-  FileDeleteResponse,
-  FileExpirationAfter,
+  CreateEmbeddingResponse,
+  Embedding,
+  EmbeddingCreateParams,
+  EmbeddingModel,
+  Embeddings,
+} from './resources/embeddings';
+import {
+  FileContent,
+  FileCreateParams,
+  FileDeleted,
   FileListParams,
-  FileListResponse,
-  FileRetrieveContentResponse,
-  FileUploadParams,
+  FileObject,
+  FileObjectsPage,
+  FilePurpose,
   Files,
-  OpenAIFile,
 } from './resources/files';
 import {
-  ImageCreateEditParams,
-  ImageCreateGenerationParams,
+  Image,
   ImageCreateVariationParams,
-  ImageRefParam,
+  ImageEditCompletedEvent,
+  ImageEditParams,
+  ImageEditParamsNonStreaming,
+  ImageEditParamsStreaming,
+  ImageEditPartialImageEvent,
+  ImageEditStreamEvent,
+  ImageGenCompletedEvent,
+  ImageGenPartialImageEvent,
+  ImageGenStreamEvent,
+  ImageGenerateParams,
+  ImageGenerateParamsNonStreaming,
+  ImageGenerateParamsStreaming,
+  ImageModel,
   Images,
   ImagesResponse,
-  PartialImages,
 } from './resources/images';
-import { Model, ModelDeleteResponse, ModelListResponse, Models } from './resources/models';
-import { ModerationClassifyParams, ModerationClassifyResponse, Moderations } from './resources/moderations';
+import { Model, ModelDeleted, Models, ModelsPage } from './resources/models';
 import {
-  CompactionBody,
-  ContainerMemoryLimit,
-  ConversationParam,
-  ModelIDs,
-  ModelResponsePropertiesStandard,
-  Reasoning,
-  Response,
-  ResponseCompactParams,
-  ResponseCompactResponse,
-  ResponseCreateParams,
-  ResponseGetInputTokensParams,
-  ResponseGetInputTokensResponse,
-  ResponseListInputItemsParams,
-  ResponseListInputItemsResponse,
-  ResponseProperties,
-  ResponseRetrieveParams,
-  ResponseTextParam,
-  ResponseTool,
-  ResponseUsage,
-  Responses,
-  TextResponseFormatConfiguration,
-  ToolChoiceParam,
-} from './resources/responses';
+  Moderation,
+  ModerationCreateParams,
+  ModerationCreateResponse,
+  ModerationImageURLInput,
+  ModerationModel,
+  ModerationMultiModalInput,
+  ModerationTextInput,
+  Moderations,
+} from './resources/moderations';
 import {
-  Upload,
-  UploadAddPartParams,
-  UploadAddPartResponse,
-  UploadCompleteParams,
-  UploadCreateParams,
-  Uploads as UploadsAPIUploads,
-} from './resources/uploads';
-import {
-  OrderEnum,
+  Video,
+  VideoCreateError,
   VideoCreateParams,
-  VideoCreateRemixParams,
   VideoDeleteResponse,
   VideoDownloadContentParams,
-  VideoDownloadContentResponse,
   VideoListParams,
-  VideoListResponse,
   VideoModel,
-  VideoResource,
+  VideoRemixParams,
   VideoSeconds,
   VideoSize,
   Videos,
+  VideosPage,
 } from './resources/videos';
-import {
-  Audio,
-  AudioCreateCustomVoiceParams,
-  AudioCreateCustomVoiceResponse,
-  AudioGenerateAudioParams,
-  AudioTranscribeAudioParams,
-  AudioTranscribeAudioResponse,
-  AudioTranslateAudioParams,
-  AudioTranslateAudioResponse,
-  TranscriptTextUsageDuration,
-  TranscriptTextUsageTokens,
-  TranscriptionSegment,
-  VoiceIDsOrCustomVoice,
-} from './resources/audio/audio';
+import { Audio, AudioModel, AudioResponseFormat } from './resources/audio/audio';
+import { Beta } from './resources/beta/beta';
 import { Chat } from './resources/chat/chat';
-import { Chatkit } from './resources/chatkit/chatkit';
 import {
   ContainerCreateParams,
+  ContainerCreateResponse,
   ContainerListParams,
   ContainerListResponse,
-  ContainerResource,
+  ContainerListResponsesPage,
+  ContainerRetrieveResponse,
   Containers,
-  InlineSkillParam,
-  NetworkPolicyAllowlistParam,
-  NetworkPolicyDisabledParam,
-  SkillReferenceParam,
 } from './resources/containers/containers';
+import { Conversations } from './resources/conversations/conversations';
 import {
-  ConversationCreateParams,
-  ConversationDeleteResponse,
-  ConversationUpdateParams,
-  Conversations,
-} from './resources/conversations/conversations';
-import {
-  Eval,
   EvalCreateParams,
+  EvalCreateResponse,
+  EvalCustomDataSourceConfig,
   EvalDeleteResponse,
   EvalListParams,
   EvalListResponse,
+  EvalListResponsesPage,
+  EvalRetrieveResponse,
+  EvalStoredCompletionsDataSourceConfig,
   EvalUpdateParams,
+  EvalUpdateResponse,
   Evals,
-  GraderLabelModel,
-  GraderPythonEval,
-  GraderScoreEvalModel,
-  GraderStringCheckEval,
-  GraderTextSimilarityEval,
 } from './resources/evals/evals';
 import { FineTuning } from './resources/fine-tuning/fine-tuning';
+import { Graders } from './resources/graders/graders';
+import { Realtime } from './resources/realtime/realtime';
+import { Responses } from './resources/responses/responses';
 import {
-  AuditLogActorUser,
-  AuditLogEventType,
-  Organization,
-  OrganizationGetCostsParams,
-  OrganizationListAuditLogsParams,
-  OrganizationListAuditLogsResponse,
-  UsageResponse,
-} from './resources/organization/organization';
-import { Projects } from './resources/projects/projects';
-import {
-  AudioTranscription,
-  NoiseReductionType,
-  Realtime,
-  RealtimeCreateClientSecretParams,
-  RealtimeCreateClientSecretResponse,
-  RealtimeCreateSessionParams,
-  RealtimeCreateSessionResponse,
-  RealtimeCreateTranscriptionSessionParams,
-  RealtimeCreateTranscriptionSessionResponse,
-  RealtimeFunctionTool,
-  VoiceIDsShared,
-} from './resources/realtime/realtime';
-import {
+  DeletedSkill,
+  Skill,
   SkillCreateParams,
-  SkillDeleteResponse,
-  SkillDownloadContentResponse,
+  SkillList,
   SkillListParams,
-  SkillListResponse,
-  SkillResource,
-  SkillUpdateVersionPointerParams,
+  SkillUpdateParams,
   Skills,
+  SkillsPage,
 } from './resources/skills/skills';
 import {
-  CreateThreadRequest,
-  ThreadCreateParams,
-  ThreadDeleteResponse,
-  ThreadObject,
-  ThreadUpdateParams,
-  Threads,
-} from './resources/threads/threads';
+  Upload,
+  UploadCompleteParams,
+  UploadCreateParams,
+  Uploads as UploadsAPIUploads,
+} from './resources/uploads/uploads';
 import {
-  AutoChunkingStrategyRequestParam,
-  ComparisonFilter,
-  CompoundFilter,
-  StaticChunkingStrategy,
-  StaticChunkingStrategyRequestParam,
+  AutoFileChunkingStrategyParam,
+  FileChunkingStrategy,
+  FileChunkingStrategyParam,
+  OtherFileChunkingStrategyObject,
+  StaticFileChunkingStrategy,
+  StaticFileChunkingStrategyObject,
+  StaticFileChunkingStrategyObjectParam,
+  VectorStore,
   VectorStoreCreateParams,
-  VectorStoreDeleteResponse,
-  VectorStoreExpirationAfter,
+  VectorStoreDeleted,
   VectorStoreListParams,
-  VectorStoreListResponse,
-  VectorStoreObject,
   VectorStoreSearchParams,
   VectorStoreSearchResponse,
+  VectorStoreSearchResponsesPage,
   VectorStoreUpdateParams,
   VectorStores,
+  VectorStoresPage,
 } from './resources/vector-stores/vector-stores';
+import { Webhooks } from './resources/webhooks/webhooks';
+import {
+  ChatCompletion,
+  ChatCompletionAllowedToolChoice,
+  ChatCompletionAllowedTools,
+  ChatCompletionAssistantMessageParam,
+  ChatCompletionAudio,
+  ChatCompletionAudioParam,
+  ChatCompletionChunk,
+  ChatCompletionContentPart,
+  ChatCompletionContentPartImage,
+  ChatCompletionContentPartInputAudio,
+  ChatCompletionContentPartRefusal,
+  ChatCompletionContentPartText,
+  ChatCompletionCreateParams,
+  ChatCompletionCreateParamsNonStreaming,
+  ChatCompletionCreateParamsStreaming,
+  ChatCompletionCustomTool,
+  ChatCompletionDeleted,
+  ChatCompletionDeveloperMessageParam,
+  ChatCompletionFunctionCallOption,
+  ChatCompletionFunctionMessageParam,
+  ChatCompletionFunctionTool,
+  ChatCompletionListParams,
+  ChatCompletionMessage,
+  ChatCompletionMessageCustomToolCall,
+  ChatCompletionMessageFunctionToolCall,
+  ChatCompletionMessageParam,
+  ChatCompletionMessageToolCall,
+  ChatCompletionModality,
+  ChatCompletionNamedToolChoice,
+  ChatCompletionNamedToolChoiceCustom,
+  ChatCompletionPredictionContent,
+  ChatCompletionReasoningEffort,
+  ChatCompletionRole,
+  ChatCompletionStoreMessage,
+  ChatCompletionStreamOptions,
+  ChatCompletionSystemMessageParam,
+  ChatCompletionTokenLogprob,
+  ChatCompletionTool,
+  ChatCompletionToolChoiceOption,
+  ChatCompletionToolMessageParam,
+  ChatCompletionUpdateParams,
+  ChatCompletionUserMessageParam,
+  ChatCompletionsPage,
+} from './resources/chat/completions/completions';
 import { type Fetch } from './internal/builtin-types';
+import { isRunningInBrowser } from './internal/detect-platform';
 import { HeadersLike, NullableHeaders, buildHeaders } from './internal/headers';
 import { FinalRequestOptions, RequestOptions } from './internal/request-options';
 import { readEnv } from './internal/utils/env';
@@ -231,14 +234,29 @@ import { isEmptyObj } from './internal/utils/values';
 
 export interface ClientOptions {
   /**
-   * Defaults to process.env['OPENAI_MCP_TEST_API_KEY'].
+   * Defaults to process.env['OPENAI_API_KEY'].
    */
   apiKey?: string | undefined;
 
   /**
+   * Defaults to process.env['OPENAI_ORG_ID'].
+   */
+  organization?: string | null | undefined;
+
+  /**
+   * Defaults to process.env['OPENAI_PROJECT_ID'].
+   */
+  project?: string | null | undefined;
+
+  /**
+   * Defaults to process.env['OPENAI_WEBHOOK_SECRET'].
+   */
+  webhookSecret?: string | null | undefined;
+
+  /**
    * Override the default base URL for the API, e.g., "https://api.example.com/v2/"
    *
-   * Defaults to process.env['OPENAI_MCP_TEST_BASE_URL'].
+   * Defaults to process.env['OPENAI_BASE_URL'].
    */
   baseURL?: string | null | undefined;
 
@@ -290,9 +308,15 @@ export interface ClientOptions {
   defaultQuery?: Record<string, string | undefined> | undefined;
 
   /**
+   * By default, client-side use of this library is not allowed, as it risks exposing your secret API credentials to attackers.
+   * Only set this option to `true` if you understand the risks and have appropriate mitigations in place.
+   */
+  dangerouslyAllowBrowser?: boolean | undefined;
+
+  /**
    * Set the log level.
    *
-   * Defaults to process.env['OPENAI_MCP_TEST_LOG'] or 'warn' if it isn't set.
+   * Defaults to process.env['OPENAI_LOG'] or 'warn' if it isn't set.
    */
   logLevel?: LogLevel | undefined;
 
@@ -305,10 +329,13 @@ export interface ClientOptions {
 }
 
 /**
- * API Client for interfacing with the OpenAI Mcp Test API.
+ * API Client for interfacing with the OpenAI API.
  */
-export class OpenAIMcpTest {
+export class OpenAI {
   apiKey: string;
+  organization: string | null;
+  project: string | null;
+  webhookSecret: string | null;
 
   baseURL: string;
   maxRetries: number;
@@ -323,43 +350,59 @@ export class OpenAIMcpTest {
   private _options: ClientOptions;
 
   /**
-   * API Client for interfacing with the OpenAI Mcp Test API.
+   * API Client for interfacing with the OpenAI API.
    *
-   * @param {string | undefined} [opts.apiKey=process.env['OPENAI_MCP_TEST_API_KEY'] ?? undefined]
-   * @param {string} [opts.baseURL=process.env['OPENAI_MCP_TEST_BASE_URL'] ?? https://api.openai.com/v1] - Override the default base URL for the API.
-   * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
+   * @param {string | undefined} [opts.apiKey=process.env['OPENAI_API_KEY'] ?? undefined]
+   * @param {string | null | undefined} [opts.organization=process.env['OPENAI_ORG_ID'] ?? null]
+   * @param {string | null | undefined} [opts.project=process.env['OPENAI_PROJECT_ID'] ?? null]
+   * @param {string | null | undefined} [opts.webhookSecret=process.env['OPENAI_WEBHOOK_SECRET'] ?? null]
+   * @param {string} [opts.baseURL=process.env['OPENAI_BASE_URL'] ?? https://api.openai.com/v1] - Override the default base URL for the API.
+   * @param {number} [opts.timeout=10 minutes] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {MergedRequestInit} [opts.fetchOptions] - Additional `RequestInit` options to be passed to `fetch` calls.
    * @param {Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
    * @param {number} [opts.maxRetries=2] - The maximum number of times the client will retry a request.
    * @param {HeadersLike} opts.defaultHeaders - Default headers to include with every request to the API.
    * @param {Record<string, string | undefined>} opts.defaultQuery - Default query parameters to include with every request to the API.
+   * @param {boolean} [opts.dangerouslyAllowBrowser=false] - By default, client-side use of this library is not allowed, as it risks exposing your secret API credentials to attackers.
    */
   constructor({
-    baseURL = readEnv('OPENAI_MCP_TEST_BASE_URL'),
-    apiKey = readEnv('OPENAI_MCP_TEST_API_KEY'),
+    baseURL = readEnv('OPENAI_BASE_URL'),
+    apiKey = readEnv('OPENAI_API_KEY'),
+    organization = readEnv('OPENAI_ORG_ID') ?? null,
+    project = readEnv('OPENAI_PROJECT_ID') ?? null,
+    webhookSecret = readEnv('OPENAI_WEBHOOK_SECRET') ?? null,
     ...opts
   }: ClientOptions = {}) {
     if (apiKey === undefined) {
-      throw new Errors.OpenAIMcpTestError(
-        "The OPENAI_MCP_TEST_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAIMcpTest client with an apiKey option, like new OpenAIMcpTest({ apiKey: 'My API Key' }).",
+      throw new Errors.OpenAIError(
+        "The OPENAI_API_KEY environment variable is missing or empty; either provide it, or instantiate the OpenAI client with an apiKey option, like new OpenAI({ apiKey: 'My API Key' }).",
       );
     }
 
     const options: ClientOptions = {
       apiKey,
+      organization,
+      project,
+      webhookSecret,
       ...opts,
       baseURL: baseURL || `https://api.openai.com/v1`,
     };
 
+    if (!options.dangerouslyAllowBrowser && isRunningInBrowser()) {
+      throw new Errors.OpenAIError(
+        "It looks like you're running in a browser-like environment.\n\nThis is disabled by default, as it risks exposing your secret API credentials to attackers.\nIf you understand the risks and have appropriate mitigations in place,\nyou can set the `dangerouslyAllowBrowser` option to `true`, e.g.,\n\nnew OpenAI({ apiKey, dangerouslyAllowBrowser: true });\n\nhttps://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety\n",
+      );
+    }
+
     this.baseURL = options.baseURL!;
-    this.timeout = options.timeout ?? OpenAIMcpTest.DEFAULT_TIMEOUT /* 1 minute */;
+    this.timeout = options.timeout ?? OpenAI.DEFAULT_TIMEOUT /* 10 minutes */;
     this.logger = options.logger ?? console;
     const defaultLogLevel = 'warn';
     // Set default logLevel early so that we can log a warning in parseLogLevel.
     this.logLevel = defaultLogLevel;
     this.logLevel =
       parseLogLevel(options.logLevel, 'ClientOptions.logLevel', this) ??
-      parseLogLevel(readEnv('OPENAI_MCP_TEST_LOG'), "process.env['OPENAI_MCP_TEST_LOG']", this) ??
+      parseLogLevel(readEnv('OPENAI_LOG'), "process.env['OPENAI_LOG']", this) ??
       defaultLogLevel;
     this.fetchOptions = options.fetchOptions;
     this.maxRetries = options.maxRetries ?? 2;
@@ -369,6 +412,9 @@ export class OpenAIMcpTest {
     this._options = options;
 
     this.apiKey = apiKey;
+    this.organization = organization;
+    this.project = project;
+    this.webhookSecret = webhookSecret;
   }
 
   /**
@@ -385,6 +431,9 @@ export class OpenAIMcpTest {
       fetch: this.fetch,
       fetchOptions: this.fetchOptions,
       apiKey: this.apiKey,
+      organization: this.organization,
+      project: this.project,
+      webhookSecret: this.webhookSecret,
       ...options,
     });
     return client;
@@ -410,7 +459,7 @@ export class OpenAIMcpTest {
   }
 
   protected stringifyQuery(query: Record<string, unknown>): string {
-    return qs.stringify(query, { arrayFormat: 'comma' });
+    return qs.stringify(query, { arrayFormat: 'brackets' });
   }
 
   private getUserAgent(): string {
@@ -596,7 +645,11 @@ export class OpenAIMcpTest {
       throw new Errors.APIConnectionError({ cause: response });
     }
 
-    const responseInfo = `[${requestLogID}${retryLogStr}] ${req.method} ${url} ${
+    const specialHeaders = [...response.headers.entries()]
+      .filter(([name]) => name === 'x-request-id')
+      .map(([name, value]) => ', ' + name + ': ' + JSON.stringify(value))
+      .join('');
+    const responseInfo = `[${requestLogID}${retryLogStr}${specialHeaders}] ${req.method} ${url} ${
       response.ok ? 'succeeded' : 'failed'
     } with status ${response.status} in ${headersTime - startTime}ms`;
 
@@ -663,6 +716,30 @@ export class OpenAIMcpTest {
     );
 
     return { response, options, controller, requestLogID, retryOfRequestLogID, startTime };
+  }
+
+  getAPIList<Item, PageClass extends Pagination.AbstractPage<Item> = Pagination.AbstractPage<Item>>(
+    path: string,
+    Page: new (...args: any[]) => PageClass,
+    opts?: PromiseOrValue<RequestOptions>,
+  ): Pagination.PagePromise<PageClass, Item> {
+    return this.requestAPIList(
+      Page,
+      opts && 'then' in opts ?
+        opts.then((opts) => ({ method: 'get', path, ...opts }))
+      : { method: 'get', path, ...opts },
+    );
+  }
+
+  requestAPIList<
+    Item = unknown,
+    PageClass extends Pagination.AbstractPage<Item> = Pagination.AbstractPage<Item>,
+  >(
+    Page: new (...args: ConstructorParameters<typeof Pagination.AbstractPage>) => PageClass,
+    options: PromiseOrValue<FinalRequestOptions>,
+  ): Pagination.PagePromise<PageClass, Item> {
+    const request = this.makeRequest(options, null, undefined);
+    return new Pagination.PagePromise<PageClass, Item>(this as any as OpenAI, request, Page);
   }
 
   async fetchWithTimeout(
@@ -830,6 +907,8 @@ export class OpenAIMcpTest {
         'X-Stainless-Retry-Count': String(retryCount),
         ...(options.timeout ? { 'X-Stainless-Timeout': String(Math.trunc(options.timeout / 1000)) } : {}),
         ...getPlatformHeaders(),
+        'OpenAI-Organization': this.organization,
+        'OpenAI-Project': this.project,
       },
       await this.authHeaders(options),
       this._options.defaultHeaders,
@@ -893,10 +972,10 @@ export class OpenAIMcpTest {
     }
   }
 
-  static OpenAIMcpTest = this;
-  static DEFAULT_TIMEOUT = 60000; // 1 minute
+  static OpenAI = this;
+  static DEFAULT_TIMEOUT = 600000; // 10 minutes
 
-  static OpenAIMcpTestError = Errors.OpenAIMcpTestError;
+  static OpenAIError = Errors.OpenAIError;
   static APIError = Errors.APIError;
   static APIConnectionError = Errors.APIConnectionError;
   static APIConnectionTimeoutError = Errors.APIConnectionTimeoutError;
@@ -912,299 +991,302 @@ export class OpenAIMcpTest {
 
   static toFile = Uploads.toFile;
 
-  assistants: API.Assistants = new API.Assistants(this);
-  audio: API.Audio = new API.Audio(this);
-  batches: API.Batches = new API.Batches(this);
-  chat: API.Chat = new API.Chat(this);
   completions: API.Completions = new API.Completions(this);
-  containers: API.Containers = new API.Containers(this);
-  conversations: API.Conversations = new API.Conversations(this);
+  chat: API.Chat = new API.Chat(this);
   embeddings: API.Embeddings = new API.Embeddings(this);
-  evals: API.Evals = new API.Evals(this);
   files: API.Files = new API.Files(this);
-  fineTuning: API.FineTuning = new API.FineTuning(this);
   images: API.Images = new API.Images(this);
-  models: API.Models = new API.Models(this);
+  audio: API.Audio = new API.Audio(this);
   moderations: API.Moderations = new API.Moderations(this);
-  organization: API.Organization = new API.Organization(this);
-  projects: API.Projects = new API.Projects(this);
-  realtime: API.Realtime = new API.Realtime(this);
-  responses: API.Responses = new API.Responses(this);
-  threads: API.Threads = new API.Threads(this);
-  uploads: API.Uploads = new API.Uploads(this);
+  models: API.Models = new API.Models(this);
+  fineTuning: API.FineTuning = new API.FineTuning(this);
+  graders: API.Graders = new API.Graders(this);
   vectorStores: API.VectorStores = new API.VectorStores(this);
-  videos: API.Videos = new API.Videos(this);
+  webhooks: API.Webhooks = new API.Webhooks(this);
+  beta: API.Beta = new API.Beta(this);
+  batches: API.Batches = new API.Batches(this);
+  uploads: API.Uploads = new API.Uploads(this);
+  responses: API.Responses = new API.Responses(this);
+  realtime: API.Realtime = new API.Realtime(this);
+  conversations: API.Conversations = new API.Conversations(this);
+  evals: API.Evals = new API.Evals(this);
+  containers: API.Containers = new API.Containers(this);
   skills: API.Skills = new API.Skills(this);
-  chatkit: API.Chatkit = new API.Chatkit(this);
+  videos: API.Videos = new API.Videos(this);
 }
 
-OpenAIMcpTest.Assistants = Assistants;
-OpenAIMcpTest.Audio = Audio;
-OpenAIMcpTest.Batches = Batches;
-OpenAIMcpTest.Chat = Chat;
-OpenAIMcpTest.Completions = Completions;
-OpenAIMcpTest.Containers = Containers;
-OpenAIMcpTest.Conversations = Conversations;
-OpenAIMcpTest.Embeddings = Embeddings;
-OpenAIMcpTest.Evals = Evals;
-OpenAIMcpTest.Files = Files;
-OpenAIMcpTest.FineTuning = FineTuning;
-OpenAIMcpTest.Images = Images;
-OpenAIMcpTest.Models = Models;
-OpenAIMcpTest.Moderations = Moderations;
-OpenAIMcpTest.Organization = Organization;
-OpenAIMcpTest.Projects = Projects;
-OpenAIMcpTest.Realtime = Realtime;
-OpenAIMcpTest.Responses = Responses;
-OpenAIMcpTest.Threads = Threads;
-OpenAIMcpTest.Uploads = UploadsAPIUploads;
-OpenAIMcpTest.VectorStores = VectorStores;
-OpenAIMcpTest.Videos = Videos;
-OpenAIMcpTest.Skills = Skills;
-OpenAIMcpTest.Chatkit = Chatkit;
+OpenAI.Completions = Completions;
+OpenAI.Chat = Chat;
+OpenAI.Embeddings = Embeddings;
+OpenAI.Files = Files;
+OpenAI.Images = Images;
+OpenAI.Audio = Audio;
+OpenAI.Moderations = Moderations;
+OpenAI.Models = Models;
+OpenAI.FineTuning = FineTuning;
+OpenAI.Graders = Graders;
+OpenAI.VectorStores = VectorStores;
+OpenAI.Webhooks = Webhooks;
+OpenAI.Beta = Beta;
+OpenAI.Batches = Batches;
+OpenAI.Uploads = UploadsAPIUploads;
+OpenAI.Responses = Responses;
+OpenAI.Realtime = Realtime;
+OpenAI.Conversations = Conversations;
+OpenAI.Evals = Evals;
+OpenAI.Containers = Containers;
+OpenAI.Skills = Skills;
+OpenAI.Videos = Videos;
 
-export declare namespace OpenAIMcpTest {
+export declare namespace OpenAI {
   export type RequestOptions = Opts.RequestOptions;
 
-  export {
-    Assistants as Assistants,
-    type AssistantObject as AssistantObject,
-    type AssistantSupportedModels as AssistantSupportedModels,
-    type AssistantToolsCode as AssistantToolsCode,
-    type AssistantToolsFileSearch as AssistantToolsFileSearch,
-    type AssistantToolsFunction as AssistantToolsFunction,
-    type FileSearchRanker as FileSearchRanker,
-    type FunctionObject as FunctionObject,
-    type ReasoningEffort as ReasoningEffort,
-    type AssistantListResponse as AssistantListResponse,
-    type AssistantDeleteResponse as AssistantDeleteResponse,
-    type AssistantCreateParams as AssistantCreateParams,
-    type AssistantUpdateParams as AssistantUpdateParams,
-    type AssistantListParams as AssistantListParams,
-  };
+  export import Page = Pagination.Page;
+  export { type PageResponse as PageResponse };
 
-  export {
-    Audio as Audio,
-    type TranscriptTextUsageDuration as TranscriptTextUsageDuration,
-    type TranscriptTextUsageTokens as TranscriptTextUsageTokens,
-    type TranscriptionSegment as TranscriptionSegment,
-    type VoiceIDsOrCustomVoice as VoiceIDsOrCustomVoice,
-    type AudioCreateCustomVoiceResponse as AudioCreateCustomVoiceResponse,
-    type AudioTranscribeAudioResponse as AudioTranscribeAudioResponse,
-    type AudioTranslateAudioResponse as AudioTranslateAudioResponse,
-    type AudioCreateCustomVoiceParams as AudioCreateCustomVoiceParams,
-    type AudioGenerateAudioParams as AudioGenerateAudioParams,
-    type AudioTranscribeAudioParams as AudioTranscribeAudioParams,
-    type AudioTranslateAudioParams as AudioTranslateAudioParams,
-  };
+  export import CursorPage = Pagination.CursorPage;
+  export { type CursorPageParams as CursorPageParams, type CursorPageResponse as CursorPageResponse };
 
+  export import ConversationCursorPage = Pagination.ConversationCursorPage;
   export {
-    Batches as Batches,
-    type Batch as Batch,
-    type BatchListResponse as BatchListResponse,
-    type BatchCreateParams as BatchCreateParams,
-    type BatchListParams as BatchListParams,
+    type ConversationCursorPageParams as ConversationCursorPageParams,
+    type ConversationCursorPageResponse as ConversationCursorPageResponse,
   };
-
-  export { Chat as Chat };
 
   export {
     Completions as Completions,
-    type ChatCompletionStreamOptions as ChatCompletionStreamOptions,
-    type StopConfiguration as StopConfiguration,
-    type CompletionCreateResponse as CompletionCreateResponse,
+    type Completion as Completion,
+    type CompletionChoice as CompletionChoice,
+    type CompletionUsage as CompletionUsage,
     type CompletionCreateParams as CompletionCreateParams,
+    type CompletionCreateParamsNonStreaming as CompletionCreateParamsNonStreaming,
+    type CompletionCreateParamsStreaming as CompletionCreateParamsStreaming,
   };
 
   export {
-    Containers as Containers,
-    type ContainerResource as ContainerResource,
-    type InlineSkillParam as InlineSkillParam,
-    type NetworkPolicyAllowlistParam as NetworkPolicyAllowlistParam,
-    type NetworkPolicyDisabledParam as NetworkPolicyDisabledParam,
-    type SkillReferenceParam as SkillReferenceParam,
-    type ContainerListResponse as ContainerListResponse,
-    type ContainerCreateParams as ContainerCreateParams,
-    type ContainerListParams as ContainerListParams,
-  };
-
-  export {
-    Conversations as Conversations,
-    type ConversationDeleteResponse as ConversationDeleteResponse,
-    type ConversationCreateParams as ConversationCreateParams,
-    type ConversationUpdateParams as ConversationUpdateParams,
+    Chat as Chat,
+    type ChatCompletion as ChatCompletion,
+    type ChatCompletionAllowedToolChoice as ChatCompletionAllowedToolChoice,
+    type ChatCompletionAssistantMessageParam as ChatCompletionAssistantMessageParam,
+    type ChatCompletionAudio as ChatCompletionAudio,
+    type ChatCompletionAudioParam as ChatCompletionAudioParam,
+    type ChatCompletionChunk as ChatCompletionChunk,
+    type ChatCompletionContentPart as ChatCompletionContentPart,
+    type ChatCompletionContentPartImage as ChatCompletionContentPartImage,
+    type ChatCompletionContentPartInputAudio as ChatCompletionContentPartInputAudio,
+    type ChatCompletionContentPartRefusal as ChatCompletionContentPartRefusal,
+    type ChatCompletionContentPartText as ChatCompletionContentPartText,
+    type ChatCompletionCustomTool as ChatCompletionCustomTool,
+    type ChatCompletionDeleted as ChatCompletionDeleted,
+    type ChatCompletionDeveloperMessageParam as ChatCompletionDeveloperMessageParam,
+    type ChatCompletionFunctionCallOption as ChatCompletionFunctionCallOption,
+    type ChatCompletionFunctionMessageParam as ChatCompletionFunctionMessageParam,
+    type ChatCompletionFunctionTool as ChatCompletionFunctionTool,
+    type ChatCompletionMessage as ChatCompletionMessage,
+    type ChatCompletionMessageCustomToolCall as ChatCompletionMessageCustomToolCall,
+    type ChatCompletionMessageFunctionToolCall as ChatCompletionMessageFunctionToolCall,
+    type ChatCompletionMessageParam as ChatCompletionMessageParam,
+    type ChatCompletionMessageToolCall as ChatCompletionMessageToolCall,
+    type ChatCompletionModality as ChatCompletionModality,
+    type ChatCompletionNamedToolChoice as ChatCompletionNamedToolChoice,
+    type ChatCompletionNamedToolChoiceCustom as ChatCompletionNamedToolChoiceCustom,
+    type ChatCompletionPredictionContent as ChatCompletionPredictionContent,
+    type ChatCompletionRole as ChatCompletionRole,
+    type ChatCompletionStoreMessage as ChatCompletionStoreMessage,
+    type ChatCompletionStreamOptions as ChatCompletionStreamOptions,
+    type ChatCompletionSystemMessageParam as ChatCompletionSystemMessageParam,
+    type ChatCompletionTokenLogprob as ChatCompletionTokenLogprob,
+    type ChatCompletionTool as ChatCompletionTool,
+    type ChatCompletionToolChoiceOption as ChatCompletionToolChoiceOption,
+    type ChatCompletionToolMessageParam as ChatCompletionToolMessageParam,
+    type ChatCompletionUserMessageParam as ChatCompletionUserMessageParam,
+    type ChatCompletionAllowedTools as ChatCompletionAllowedTools,
+    type ChatCompletionReasoningEffort as ChatCompletionReasoningEffort,
+    type ChatCompletionsPage as ChatCompletionsPage,
+    type ChatCompletionCreateParams as ChatCompletionCreateParams,
+    type ChatCompletionCreateParamsNonStreaming as ChatCompletionCreateParamsNonStreaming,
+    type ChatCompletionCreateParamsStreaming as ChatCompletionCreateParamsStreaming,
+    type ChatCompletionUpdateParams as ChatCompletionUpdateParams,
+    type ChatCompletionListParams as ChatCompletionListParams,
   };
 
   export {
     Embeddings as Embeddings,
-    type EmbeddingCreateResponse as EmbeddingCreateResponse,
+    type CreateEmbeddingResponse as CreateEmbeddingResponse,
+    type Embedding as Embedding,
+    type EmbeddingModel as EmbeddingModel,
     type EmbeddingCreateParams as EmbeddingCreateParams,
   };
 
   export {
-    Evals as Evals,
-    type Eval as Eval,
-    type GraderLabelModel as GraderLabelModel,
-    type GraderPythonEval as GraderPythonEval,
-    type GraderScoreEvalModel as GraderScoreEvalModel,
-    type GraderStringCheckEval as GraderStringCheckEval,
-    type GraderTextSimilarityEval as GraderTextSimilarityEval,
-    type EvalListResponse as EvalListResponse,
-    type EvalDeleteResponse as EvalDeleteResponse,
-    type EvalCreateParams as EvalCreateParams,
-    type EvalUpdateParams as EvalUpdateParams,
-    type EvalListParams as EvalListParams,
-  };
-
-  export {
     Files as Files,
-    type FileExpirationAfter as FileExpirationAfter,
-    type OpenAIFile as OpenAIFile,
-    type FileListResponse as FileListResponse,
-    type FileDeleteResponse as FileDeleteResponse,
-    type FileRetrieveContentResponse as FileRetrieveContentResponse,
+    type FileContent as FileContent,
+    type FileDeleted as FileDeleted,
+    type FileObject as FileObject,
+    type FilePurpose as FilePurpose,
+    type FileObjectsPage as FileObjectsPage,
+    type FileCreateParams as FileCreateParams,
     type FileListParams as FileListParams,
-    type FileUploadParams as FileUploadParams,
   };
-
-  export { FineTuning as FineTuning };
 
   export {
     Images as Images,
-    type ImageRefParam as ImageRefParam,
+    type Image as Image,
+    type ImageEditCompletedEvent as ImageEditCompletedEvent,
+    type ImageEditPartialImageEvent as ImageEditPartialImageEvent,
+    type ImageEditStreamEvent as ImageEditStreamEvent,
+    type ImageGenCompletedEvent as ImageGenCompletedEvent,
+    type ImageGenPartialImageEvent as ImageGenPartialImageEvent,
+    type ImageGenStreamEvent as ImageGenStreamEvent,
+    type ImageModel as ImageModel,
     type ImagesResponse as ImagesResponse,
-    type PartialImages as PartialImages,
-    type ImageCreateEditParams as ImageCreateEditParams,
-    type ImageCreateGenerationParams as ImageCreateGenerationParams,
     type ImageCreateVariationParams as ImageCreateVariationParams,
+    type ImageEditParams as ImageEditParams,
+    type ImageEditParamsNonStreaming as ImageEditParamsNonStreaming,
+    type ImageEditParamsStreaming as ImageEditParamsStreaming,
+    type ImageGenerateParams as ImageGenerateParams,
+    type ImageGenerateParamsNonStreaming as ImageGenerateParamsNonStreaming,
+    type ImageGenerateParamsStreaming as ImageGenerateParamsStreaming,
+  };
+
+  export { Audio as Audio, type AudioModel as AudioModel, type AudioResponseFormat as AudioResponseFormat };
+
+  export {
+    Moderations as Moderations,
+    type Moderation as Moderation,
+    type ModerationImageURLInput as ModerationImageURLInput,
+    type ModerationModel as ModerationModel,
+    type ModerationMultiModalInput as ModerationMultiModalInput,
+    type ModerationTextInput as ModerationTextInput,
+    type ModerationCreateResponse as ModerationCreateResponse,
+    type ModerationCreateParams as ModerationCreateParams,
   };
 
   export {
     Models as Models,
     type Model as Model,
-    type ModelListResponse as ModelListResponse,
-    type ModelDeleteResponse as ModelDeleteResponse,
+    type ModelDeleted as ModelDeleted,
+    type ModelsPage as ModelsPage,
   };
 
-  export {
-    Moderations as Moderations,
-    type ModerationClassifyResponse as ModerationClassifyResponse,
-    type ModerationClassifyParams as ModerationClassifyParams,
-  };
+  export { FineTuning as FineTuning };
 
-  export {
-    Organization as Organization,
-    type AuditLogActorUser as AuditLogActorUser,
-    type AuditLogEventType as AuditLogEventType,
-    type UsageResponse as UsageResponse,
-    type OrganizationListAuditLogsResponse as OrganizationListAuditLogsResponse,
-    type OrganizationGetCostsParams as OrganizationGetCostsParams,
-    type OrganizationListAuditLogsParams as OrganizationListAuditLogsParams,
-  };
-
-  export { Projects as Projects };
-
-  export {
-    Realtime as Realtime,
-    type AudioTranscription as AudioTranscription,
-    type NoiseReductionType as NoiseReductionType,
-    type RealtimeFunctionTool as RealtimeFunctionTool,
-    type VoiceIDsShared as VoiceIDsShared,
-    type RealtimeCreateClientSecretResponse as RealtimeCreateClientSecretResponse,
-    type RealtimeCreateSessionResponse as RealtimeCreateSessionResponse,
-    type RealtimeCreateTranscriptionSessionResponse as RealtimeCreateTranscriptionSessionResponse,
-    type RealtimeCreateClientSecretParams as RealtimeCreateClientSecretParams,
-    type RealtimeCreateSessionParams as RealtimeCreateSessionParams,
-    type RealtimeCreateTranscriptionSessionParams as RealtimeCreateTranscriptionSessionParams,
-  };
-
-  export {
-    Responses as Responses,
-    type CompactionBody as CompactionBody,
-    type ContainerMemoryLimit as ContainerMemoryLimit,
-    type ConversationParam as ConversationParam,
-    type ModelIDs as ModelIDs,
-    type ModelResponsePropertiesStandard as ModelResponsePropertiesStandard,
-    type Reasoning as Reasoning,
-    type Response as Response,
-    type ResponseProperties as ResponseProperties,
-    type ResponseTextParam as ResponseTextParam,
-    type ResponseTool as ResponseTool,
-    type ResponseUsage as ResponseUsage,
-    type TextResponseFormatConfiguration as TextResponseFormatConfiguration,
-    type ToolChoiceParam as ToolChoiceParam,
-    type ResponseCompactResponse as ResponseCompactResponse,
-    type ResponseGetInputTokensResponse as ResponseGetInputTokensResponse,
-    type ResponseListInputItemsResponse as ResponseListInputItemsResponse,
-    type ResponseCreateParams as ResponseCreateParams,
-    type ResponseRetrieveParams as ResponseRetrieveParams,
-    type ResponseCompactParams as ResponseCompactParams,
-    type ResponseGetInputTokensParams as ResponseGetInputTokensParams,
-    type ResponseListInputItemsParams as ResponseListInputItemsParams,
-  };
-
-  export {
-    Threads as Threads,
-    type CreateThreadRequest as CreateThreadRequest,
-    type ThreadObject as ThreadObject,
-    type ThreadDeleteResponse as ThreadDeleteResponse,
-    type ThreadCreateParams as ThreadCreateParams,
-    type ThreadUpdateParams as ThreadUpdateParams,
-  };
-
-  export {
-    UploadsAPIUploads as Uploads,
-    type Upload as Upload,
-    type UploadAddPartResponse as UploadAddPartResponse,
-    type UploadCreateParams as UploadCreateParams,
-    type UploadAddPartParams as UploadAddPartParams,
-    type UploadCompleteParams as UploadCompleteParams,
-  };
+  export { Graders as Graders };
 
   export {
     VectorStores as VectorStores,
-    type AutoChunkingStrategyRequestParam as AutoChunkingStrategyRequestParam,
-    type ComparisonFilter as ComparisonFilter,
-    type CompoundFilter as CompoundFilter,
-    type StaticChunkingStrategy as StaticChunkingStrategy,
-    type StaticChunkingStrategyRequestParam as StaticChunkingStrategyRequestParam,
-    type VectorStoreExpirationAfter as VectorStoreExpirationAfter,
-    type VectorStoreObject as VectorStoreObject,
-    type VectorStoreListResponse as VectorStoreListResponse,
-    type VectorStoreDeleteResponse as VectorStoreDeleteResponse,
+    type AutoFileChunkingStrategyParam as AutoFileChunkingStrategyParam,
+    type FileChunkingStrategy as FileChunkingStrategy,
+    type FileChunkingStrategyParam as FileChunkingStrategyParam,
+    type OtherFileChunkingStrategyObject as OtherFileChunkingStrategyObject,
+    type StaticFileChunkingStrategy as StaticFileChunkingStrategy,
+    type StaticFileChunkingStrategyObject as StaticFileChunkingStrategyObject,
+    type StaticFileChunkingStrategyObjectParam as StaticFileChunkingStrategyObjectParam,
+    type VectorStore as VectorStore,
+    type VectorStoreDeleted as VectorStoreDeleted,
     type VectorStoreSearchResponse as VectorStoreSearchResponse,
+    type VectorStoresPage as VectorStoresPage,
+    type VectorStoreSearchResponsesPage as VectorStoreSearchResponsesPage,
     type VectorStoreCreateParams as VectorStoreCreateParams,
     type VectorStoreUpdateParams as VectorStoreUpdateParams,
     type VectorStoreListParams as VectorStoreListParams,
     type VectorStoreSearchParams as VectorStoreSearchParams,
   };
 
+  export { Webhooks as Webhooks };
+
+  export { Beta as Beta };
+
   export {
-    Videos as Videos,
-    type OrderEnum as OrderEnum,
-    type VideoModel as VideoModel,
-    type VideoResource as VideoResource,
-    type VideoSeconds as VideoSeconds,
-    type VideoSize as VideoSize,
-    type VideoListResponse as VideoListResponse,
-    type VideoDeleteResponse as VideoDeleteResponse,
-    type VideoDownloadContentResponse as VideoDownloadContentResponse,
-    type VideoCreateParams as VideoCreateParams,
-    type VideoListParams as VideoListParams,
-    type VideoCreateRemixParams as VideoCreateRemixParams,
-    type VideoDownloadContentParams as VideoDownloadContentParams,
+    Batches as Batches,
+    type Batch as Batch,
+    type BatchError as BatchError,
+    type BatchRequestCounts as BatchRequestCounts,
+    type BatchUsage as BatchUsage,
+    type BatchesPage as BatchesPage,
+    type BatchCreateParams as BatchCreateParams,
+    type BatchListParams as BatchListParams,
+  };
+
+  export {
+    UploadsAPIUploads as Uploads,
+    type Upload as Upload,
+    type UploadCreateParams as UploadCreateParams,
+    type UploadCompleteParams as UploadCompleteParams,
+  };
+
+  export { Responses as Responses };
+
+  export { Realtime as Realtime };
+
+  export { Conversations as Conversations };
+
+  export {
+    Evals as Evals,
+    type EvalCustomDataSourceConfig as EvalCustomDataSourceConfig,
+    type EvalStoredCompletionsDataSourceConfig as EvalStoredCompletionsDataSourceConfig,
+    type EvalCreateResponse as EvalCreateResponse,
+    type EvalRetrieveResponse as EvalRetrieveResponse,
+    type EvalUpdateResponse as EvalUpdateResponse,
+    type EvalListResponse as EvalListResponse,
+    type EvalDeleteResponse as EvalDeleteResponse,
+    type EvalListResponsesPage as EvalListResponsesPage,
+    type EvalCreateParams as EvalCreateParams,
+    type EvalUpdateParams as EvalUpdateParams,
+    type EvalListParams as EvalListParams,
+  };
+
+  export {
+    Containers as Containers,
+    type ContainerCreateResponse as ContainerCreateResponse,
+    type ContainerRetrieveResponse as ContainerRetrieveResponse,
+    type ContainerListResponse as ContainerListResponse,
+    type ContainerListResponsesPage as ContainerListResponsesPage,
+    type ContainerCreateParams as ContainerCreateParams,
+    type ContainerListParams as ContainerListParams,
   };
 
   export {
     Skills as Skills,
-    type SkillResource as SkillResource,
-    type SkillListResponse as SkillListResponse,
-    type SkillDeleteResponse as SkillDeleteResponse,
-    type SkillDownloadContentResponse as SkillDownloadContentResponse,
+    type DeletedSkill as DeletedSkill,
+    type Skill as Skill,
+    type SkillList as SkillList,
+    type SkillsPage as SkillsPage,
     type SkillCreateParams as SkillCreateParams,
+    type SkillUpdateParams as SkillUpdateParams,
     type SkillListParams as SkillListParams,
-    type SkillUpdateVersionPointerParams as SkillUpdateVersionPointerParams,
   };
 
-  export { Chatkit as Chatkit };
+  export {
+    Videos as Videos,
+    type Video as Video,
+    type VideoCreateError as VideoCreateError,
+    type VideoModel as VideoModel,
+    type VideoSeconds as VideoSeconds,
+    type VideoSize as VideoSize,
+    type VideoDeleteResponse as VideoDeleteResponse,
+    type VideosPage as VideosPage,
+    type VideoCreateParams as VideoCreateParams,
+    type VideoListParams as VideoListParams,
+    type VideoDownloadContentParams as VideoDownloadContentParams,
+    type VideoRemixParams as VideoRemixParams,
+  };
+
+  export type AllModels = API.AllModels;
+  export type ChatModel = API.ChatModel;
+  export type ComparisonFilter = API.ComparisonFilter;
+  export type CompoundFilter = API.CompoundFilter;
+  export type CustomToolInputFormat = API.CustomToolInputFormat;
+  export type ErrorObject = API.ErrorObject;
+  export type FunctionDefinition = API.FunctionDefinition;
+  export type FunctionParameters = API.FunctionParameters;
+  export type Metadata = API.Metadata;
+  export type Reasoning = API.Reasoning;
+  export type ReasoningEffort = API.ReasoningEffort;
+  export type ResponseFormatJSONObject = API.ResponseFormatJSONObject;
+  export type ResponseFormatJSONSchema = API.ResponseFormatJSONSchema;
+  export type ResponseFormatText = API.ResponseFormatText;
+  export type ResponseFormatTextGrammar = API.ResponseFormatTextGrammar;
+  export type ResponseFormatTextPython = API.ResponseFormatTextPython;
+  export type ResponsesModel = API.ResponsesModel;
 }

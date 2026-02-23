@@ -1,25 +1,29 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+export { Audio, type AudioModel, type AudioResponseFormat } from './audio';
+export { Speech, type SpeechModel, type SpeechCreateParams } from './speech';
 export {
-  Audio,
-  type TranscriptTextUsageDuration,
-  type TranscriptTextUsageTokens,
+  Transcriptions,
+  type Transcription,
+  type TranscriptionDiarized,
+  type TranscriptionDiarizedSegment,
+  type TranscriptionInclude,
   type TranscriptionSegment,
-  type VoiceIDsOrCustomVoice,
-  type AudioCreateCustomVoiceResponse,
-  type AudioTranscribeAudioResponse,
-  type AudioTranslateAudioResponse,
-  type AudioCreateCustomVoiceParams,
-  type AudioGenerateAudioParams,
-  type AudioTranscribeAudioParams,
-  type AudioTranslateAudioParams,
-} from './audio';
+  type TranscriptionStreamEvent,
+  type TranscriptionTextDeltaEvent,
+  type TranscriptionTextDoneEvent,
+  type TranscriptionTextSegmentEvent,
+  type TranscriptionVerbose,
+  type TranscriptionWord,
+  type TranscriptionCreateResponse,
+  type TranscriptionCreateParams,
+  type TranscriptionCreateParamsNonStreaming,
+  type TranscriptionCreateParamsStreaming,
+} from './transcriptions';
 export {
-  VoiceConsents,
-  type VoiceConsentResource,
-  type VoiceConsentDeleteConsentResponse,
-  type VoiceConsentListConsentRecordingsResponse,
-  type VoiceConsentListConsentRecordingsParams,
-  type VoiceConsentUpdateConsentParams,
-  type VoiceConsentUploadConsentParams,
-} from './voice-consents';
+  Translations,
+  type Translation,
+  type TranslationVerbose,
+  type TranslationCreateResponse,
+  type TranslationCreateParams,
+} from './translations';

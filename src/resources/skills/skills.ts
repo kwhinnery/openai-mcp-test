@@ -1,41 +1,50 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../../core/resource';
-import * as VideosAPI from '../videos';
-import * as VersionsAPI from './versions';
+import * as ContentAPI from './content';
+import { Content } from './content';
+import * as VersionsAPI from './versions/versions';
 import {
-  SkillVersionResource,
+  DeletedSkillVersion,
+  SkillVersion,
+  SkillVersionList,
+  SkillVersionsPage,
   VersionCreateParams,
   VersionDeleteParams,
-  VersionDeleteResponse,
-  VersionDownloadContentParams,
-  VersionDownloadContentResponse,
   VersionListParams,
-  VersionListResponse,
   VersionRetrieveParams,
   Versions,
-} from './versions';
+} from './versions/versions';
 import { APIPromise } from '../../core/api-promise';
+import { CursorPage, type CursorPageParams, PagePromise } from '../../core/pagination';
 import { type Uploadable } from '../../core/uploads';
 import { RequestOptions } from '../../internal/request-options';
 import { maybeMultipartFormRequestOptions } from '../../internal/uploads';
 import { path } from '../../internal/utils/path';
 
 export class Skills extends APIResource {
+  content: ContentAPI.Content = new ContentAPI.Content(this._client);
   versions: VersionsAPI.Versions = new VersionsAPI.Versions(this._client);
 
   /**
    * Create a new skill.
    */
-  create(body: SkillCreateParams, options?: RequestOptions): APIPromise<SkillResource> {
+  create(body: SkillCreateParams | null | undefined = {}, options?: RequestOptions): APIPromise<Skill> {
     return this._client.post('/skills', maybeMultipartFormRequestOptions({ body, ...options }, this._client));
   }
 
   /**
    * Get a skill by its ID.
    */
-  retrieve(skillID: string, options?: RequestOptions): APIPromise<SkillResource> {
+  retrieve(skillID: string, options?: RequestOptions): APIPromise<Skill> {
     return this._client.get(path`/skills/${skillID}`, options);
+  }
+
+  /**
+   * Update the default version pointer for a skill.
+   */
+  update(skillID: string, body: SkillUpdateParams, options?: RequestOptions): APIPromise<Skill> {
+    return this._client.post(path`/skills/${skillID}`, { body, ...options });
   }
 
   /**
@@ -44,37 +53,29 @@ export class Skills extends APIResource {
   list(
     query: SkillListParams | null | undefined = {},
     options?: RequestOptions,
-  ): APIPromise<SkillListResponse> {
-    return this._client.get('/skills', { query, ...options });
+  ): PagePromise<SkillsPage, Skill> {
+    return this._client.getAPIList('/skills', CursorPage<Skill>, { query, ...options });
   }
 
   /**
    * Delete a skill by its ID.
    */
-  delete(skillID: string, options?: RequestOptions): APIPromise<SkillDeleteResponse> {
+  delete(skillID: string, options?: RequestOptions): APIPromise<DeletedSkill> {
     return this._client.delete(path`/skills/${skillID}`, options);
-  }
-
-  /**
-   * Download a skill zip bundle by its ID.
-   */
-  downloadContent(skillID: string, options?: RequestOptions): APIPromise<string> {
-    return this._client.get(path`/skills/${skillID}/content`, options);
-  }
-
-  /**
-   * Update the default version pointer for a skill.
-   */
-  updateVersionPointer(
-    skillID: string,
-    body: SkillUpdateVersionPointerParams,
-    options?: RequestOptions,
-  ): APIPromise<SkillResource> {
-    return this._client.post(path`/skills/${skillID}`, { body, ...options });
   }
 }
 
-export interface SkillResource {
+export type SkillsPage = CursorPage<Skill>;
+
+export interface DeletedSkill {
+  id: string;
+
+  deleted: boolean;
+
+  object: 'skill.deleted';
+}
+
+export interface Skill {
   /**
    * Unique identifier for the skill.
    */
@@ -111,11 +112,11 @@ export interface SkillResource {
   object: 'skill';
 }
 
-export interface SkillListResponse {
+export interface SkillList {
   /**
    * A list of items
    */
-  data: Array<SkillResource>;
+  data: Array<Skill>;
 
   /**
    * The ID of the first item in the list.
@@ -138,71 +139,53 @@ export interface SkillListResponse {
   object: 'list';
 }
 
-export interface SkillDeleteResponse {
-  id: string;
-
-  deleted: boolean;
-
-  object: 'skill.deleted';
-}
-
-export type SkillDownloadContentResponse = string;
-
 export interface SkillCreateParams {
   /**
    * Skill files to upload (directory upload) or a single zip file.
    */
-  files: Array<Uploadable> | Uploadable;
+  files?: Array<Uploadable> | Uploadable;
 }
 
-export interface SkillListParams {
-  /**
-   * Identifier for the last item from the previous pagination request
-   */
-  after?: string;
-
-  /**
-   * Number of items to retrieve
-   */
-  limit?: number;
-
-  /**
-   * Sort order of results by timestamp. Use `asc` for ascending order or `desc` for
-   * descending order.
-   */
-  order?: VideosAPI.OrderEnum;
-}
-
-export interface SkillUpdateVersionPointerParams {
+export interface SkillUpdateParams {
   /**
    * The skill version number to set as default.
    */
   default_version: string;
 }
 
+export interface SkillListParams extends CursorPageParams {
+  /**
+   * Sort order of results by timestamp. Use `asc` for ascending order or `desc` for
+   * descending order.
+   */
+  order?: 'asc' | 'desc';
+}
+
+Skills.Content = Content;
 Skills.Versions = Versions;
 
 export declare namespace Skills {
   export {
-    type SkillResource as SkillResource,
-    type SkillListResponse as SkillListResponse,
-    type SkillDeleteResponse as SkillDeleteResponse,
-    type SkillDownloadContentResponse as SkillDownloadContentResponse,
+    type DeletedSkill as DeletedSkill,
+    type Skill as Skill,
+    type SkillList as SkillList,
+    type SkillsPage as SkillsPage,
     type SkillCreateParams as SkillCreateParams,
+    type SkillUpdateParams as SkillUpdateParams,
     type SkillListParams as SkillListParams,
-    type SkillUpdateVersionPointerParams as SkillUpdateVersionPointerParams,
   };
+
+  export { Content as Content };
 
   export {
     Versions as Versions,
-    type SkillVersionResource as SkillVersionResource,
-    type VersionListResponse as VersionListResponse,
-    type VersionDeleteResponse as VersionDeleteResponse,
-    type VersionDownloadContentResponse as VersionDownloadContentResponse,
+    type DeletedSkillVersion as DeletedSkillVersion,
+    type SkillVersion as SkillVersion,
+    type SkillVersionList as SkillVersionList,
+    type SkillVersionsPage as SkillVersionsPage,
     type VersionCreateParams as VersionCreateParams,
     type VersionRetrieveParams as VersionRetrieveParams,
     type VersionListParams as VersionListParams,
     type VersionDeleteParams as VersionDeleteParams,
-    type VersionDownloadContentParams as VersionDownloadContentParams,
   };
 }

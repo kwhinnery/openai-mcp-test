@@ -1,8 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
-import * as ChatCompletionsAPI from './chat/completions';
+import * as CompletionsAPI from './completions';
+import * as CompletionsCompletionsAPI from './chat/completions/completions';
 import { APIPromise } from '../core/api-promise';
+import { Stream } from '../core/streaming';
 import { RequestOptions } from '../internal/request-options';
 
 export class Completions extends APIResource {
@@ -20,50 +22,27 @@ export class Completions extends APIResource {
    * });
    * ```
    */
-  create(body: CompletionCreateParams, options?: RequestOptions): APIPromise<CompletionCreateResponse> {
-    return this._client.post('/completions', { body, ...options });
+  create(body: CompletionCreateParamsNonStreaming, options?: RequestOptions): APIPromise<Completion>;
+  create(body: CompletionCreateParamsStreaming, options?: RequestOptions): APIPromise<Stream<Completion>>;
+  create(
+    body: CompletionCreateParamsBase,
+    options?: RequestOptions,
+  ): APIPromise<Stream<Completion> | Completion>;
+  create(
+    body: CompletionCreateParams,
+    options?: RequestOptions,
+  ): APIPromise<Completion> | APIPromise<Stream<Completion>> {
+    return this._client.post('/completions', { body, ...options, stream: body.stream ?? false }) as
+      | APIPromise<Completion>
+      | APIPromise<Stream<Completion>>;
   }
 }
-
-/**
- * Options for streaming response. Only set this when you set `stream: true`.
- */
-export interface ChatCompletionStreamOptions {
-  /**
-   * When true, stream obfuscation will be enabled. Stream obfuscation adds random
-   * characters to an `obfuscation` field on streaming delta events to normalize
-   * payload sizes as a mitigation to certain side-channel attacks. These obfuscation
-   * fields are included by default, but add a small amount of overhead to the data
-   * stream. You can set `include_obfuscation` to false to optimize for bandwidth if
-   * you trust the network links between your application and the OpenAI API.
-   */
-  include_obfuscation?: boolean;
-
-  /**
-   * If set, an additional chunk will be streamed before the `data: [DONE]` message.
-   * The `usage` field on this chunk shows the token usage statistics for the entire
-   * request, and the `choices` field will always be an empty array.
-   *
-   * All other chunks will also include a `usage` field, but with a null value.
-   * **NOTE:** If the stream is interrupted, you may not receive the final usage
-   * chunk which contains the total token usage for the request.
-   */
-  include_usage?: boolean;
-}
-
-/**
- * Not supported with latest reasoning models `o3` and `o4-mini`.
- *
- * Up to 4 sequences where the API will stop generating further tokens. The
- * returned text will not contain the stop sequence.
- */
-export type StopConfiguration = string | null | Array<string>;
 
 /**
  * Represents a completion response from the API. Note: both the streamed and
  * non-streamed response objects share the same shape (unlike the chat endpoint).
  */
-export interface CompletionCreateResponse {
+export interface Completion {
   /**
    * A unique identifier for the completion.
    */
@@ -72,7 +51,7 @@ export interface CompletionCreateResponse {
   /**
    * The list of completion choices the model generated for the input prompt.
    */
-  choices: Array<CompletionCreateResponse.Choice>;
+  choices: Array<CompletionChoice>;
 
   /**
    * The Unix timestamp (in seconds) of when the completion was created.
@@ -100,44 +79,122 @@ export interface CompletionCreateResponse {
   /**
    * Usage statistics for the completion request.
    */
-  usage?: ChatCompletionsAPI.Usage;
+  usage?: CompletionUsage;
 }
 
-export namespace CompletionCreateResponse {
-  export interface Choice {
+export interface CompletionChoice {
+  /**
+   * The reason the model stopped generating tokens. This will be `stop` if the model
+   * hit a natural stop point or a provided stop sequence, `length` if the maximum
+   * number of tokens specified in the request was reached, or `content_filter` if
+   * content was omitted due to a flag from our content filters.
+   */
+  finish_reason: 'stop' | 'length' | 'content_filter';
+
+  index: number;
+
+  logprobs: CompletionChoice.Logprobs | null;
+
+  text: string;
+}
+
+export namespace CompletionChoice {
+  export interface Logprobs {
+    text_offset?: Array<number>;
+
+    token_logprobs?: Array<number>;
+
+    tokens?: Array<string>;
+
+    top_logprobs?: Array<{ [key: string]: number }>;
+  }
+}
+
+/**
+ * Usage statistics for the completion request.
+ */
+export interface CompletionUsage {
+  /**
+   * Number of tokens in the generated completion.
+   */
+  completion_tokens: number;
+
+  /**
+   * Number of tokens in the prompt.
+   */
+  prompt_tokens: number;
+
+  /**
+   * Total number of tokens used in the request (prompt + completion).
+   */
+  total_tokens: number;
+
+  /**
+   * Breakdown of tokens used in a completion.
+   */
+  completion_tokens_details?: CompletionUsage.CompletionTokensDetails;
+
+  /**
+   * Breakdown of tokens used in the prompt.
+   */
+  prompt_tokens_details?: CompletionUsage.PromptTokensDetails;
+}
+
+export namespace CompletionUsage {
+  /**
+   * Breakdown of tokens used in a completion.
+   */
+  export interface CompletionTokensDetails {
     /**
-     * The reason the model stopped generating tokens. This will be `stop` if the model
-     * hit a natural stop point or a provided stop sequence, `length` if the maximum
-     * number of tokens specified in the request was reached, or `content_filter` if
-     * content was omitted due to a flag from our content filters.
+     * When using Predicted Outputs, the number of tokens in the prediction that
+     * appeared in the completion.
      */
-    finish_reason: 'stop' | 'length' | 'content_filter';
+    accepted_prediction_tokens?: number;
 
-    index: number;
+    /**
+     * Audio input tokens generated by the model.
+     */
+    audio_tokens?: number;
 
-    logprobs: Choice.Logprobs | null;
+    /**
+     * Tokens generated by the model for reasoning.
+     */
+    reasoning_tokens?: number;
 
-    text: string;
+    /**
+     * When using Predicted Outputs, the number of tokens in the prediction that did
+     * not appear in the completion. However, like reasoning tokens, these tokens are
+     * still counted in the total completion tokens for purposes of billing, output,
+     * and context window limits.
+     */
+    rejected_prediction_tokens?: number;
   }
 
-  export namespace Choice {
-    export interface Logprobs {
-      text_offset?: Array<number>;
+  /**
+   * Breakdown of tokens used in the prompt.
+   */
+  export interface PromptTokensDetails {
+    /**
+     * Audio input tokens present in the prompt.
+     */
+    audio_tokens?: number;
 
-      token_logprobs?: Array<number>;
-
-      tokens?: Array<string>;
-
-      top_logprobs?: Array<{ [key: string]: number }>;
-    }
+    /**
+     * Cached tokens present in the prompt.
+     */
+    cached_tokens?: number;
   }
 }
 
-export interface CompletionCreateParams {
+export type CompletionCreateParams = CompletionCreateParamsNonStreaming | CompletionCreateParamsStreaming;
+
+export interface CompletionCreateParamsBase {
   /**
    * ID of the model to use. You can use the
-   * [List models](/docs/api-reference/models/list) API to see all of your available
-   * models, or see our [Model overview](/docs/models) for descriptions of them.
+   * [List models](https://platform.openai.com/docs/api-reference/models/list) API to
+   * see all of your available models, or see our
+   * [Model overview](https://platform.openai.com/docs/models) for descriptions of
+   * them.
    */
   model: (string & {}) | 'gpt-3.5-turbo-instruct' | 'davinci-002' | 'babbage-002';
 
@@ -174,7 +231,7 @@ export interface CompletionCreateParams {
    * existing frequency in the text so far, decreasing the model's likelihood to
    * repeat the same line verbatim.
    *
-   * [See more information about frequency and presence penalties.](/docs/guides/text-generation)
+   * [See more information about frequency and presence penalties.](https://platform.openai.com/docs/guides/text-generation)
    */
   frequency_penalty?: number | null;
 
@@ -229,7 +286,7 @@ export interface CompletionCreateParams {
    * whether they appear in the text so far, increasing the model's likelihood to
    * talk about new topics.
    *
-   * [See more information about frequency and presence penalties.](/docs/guides/text-generation)
+   * [See more information about frequency and presence penalties.](https://platform.openai.com/docs/guides/text-generation)
    */
   presence_penalty?: number | null;
 
@@ -249,7 +306,7 @@ export interface CompletionCreateParams {
    * Up to 4 sequences where the API will stop generating further tokens. The
    * returned text will not contain the stop sequence.
    */
-  stop?: StopConfiguration | null;
+  stop?: string | null | Array<string>;
 
   /**
    * Whether to stream back partial progress. If set, tokens will be sent as
@@ -264,7 +321,7 @@ export interface CompletionCreateParams {
   /**
    * Options for streaming response. Only set this when you set `stream: true`.
    */
-  stream_options?: ChatCompletionStreamOptions | null;
+  stream_options?: CompletionsCompletionsAPI.ChatCompletionStreamOptions | null;
 
   /**
    * The suffix that comes after a completion of inserted text.
@@ -293,16 +350,48 @@ export interface CompletionCreateParams {
 
   /**
    * A unique identifier representing your end-user, which can help OpenAI to monitor
-   * and detect abuse. [Learn more](/docs/guides/safety-best-practices#end-user-ids).
+   * and detect abuse.
+   * [Learn more](https://platform.openai.com/docs/guides/safety-best-practices#end-user-ids).
    */
   user?: string;
 }
 
+export namespace CompletionCreateParams {
+  export type CompletionCreateParamsNonStreaming = CompletionsAPI.CompletionCreateParamsNonStreaming;
+  export type CompletionCreateParamsStreaming = CompletionsAPI.CompletionCreateParamsStreaming;
+}
+
+export interface CompletionCreateParamsNonStreaming extends CompletionCreateParamsBase {
+  /**
+   * Whether to stream back partial progress. If set, tokens will be sent as
+   * data-only
+   * [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#Event_stream_format)
+   * as they become available, with the stream terminated by a `data: [DONE]`
+   * message.
+   * [Example Python code](https://cookbook.openai.com/examples/how_to_stream_completions).
+   */
+  stream?: false | null;
+}
+
+export interface CompletionCreateParamsStreaming extends CompletionCreateParamsBase {
+  /**
+   * Whether to stream back partial progress. If set, tokens will be sent as
+   * data-only
+   * [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#Event_stream_format)
+   * as they become available, with the stream terminated by a `data: [DONE]`
+   * message.
+   * [Example Python code](https://cookbook.openai.com/examples/how_to_stream_completions).
+   */
+  stream: true;
+}
+
 export declare namespace Completions {
   export {
-    type ChatCompletionStreamOptions as ChatCompletionStreamOptions,
-    type StopConfiguration as StopConfiguration,
-    type CompletionCreateResponse as CompletionCreateResponse,
+    type Completion as Completion,
+    type CompletionChoice as CompletionChoice,
+    type CompletionUsage as CompletionUsage,
     type CompletionCreateParams as CompletionCreateParams,
+    type CompletionCreateParamsNonStreaming as CompletionCreateParamsNonStreaming,
+    type CompletionCreateParamsStreaming as CompletionCreateParamsStreaming,
   };
 }

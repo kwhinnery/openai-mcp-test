@@ -1,11 +1,11 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import type { OpenAIMcpTest } from '../client';
+import type { OpenAI } from '../client';
 
 export abstract class APIResource {
-  protected _client: OpenAIMcpTest;
+  protected _client: OpenAI;
 
-  constructor(client: OpenAIMcpTest) {
+  constructor(client: OpenAI) {
     this._client = client;
   }
 }

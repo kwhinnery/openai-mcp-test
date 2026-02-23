@@ -1,8 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
-import * as CompletionsAPI from './chat/completions';
+import * as BatchesAPI from './batches';
+import * as Shared from './shared';
 import { APIPromise } from '../core/api-promise';
+import { CursorPage, type CursorPageParams, PagePromise } from '../core/pagination';
 import { RequestOptions } from '../internal/request-options';
 import { path } from '../internal/utils/path';
 
@@ -27,8 +29,8 @@ export class Batches extends APIResource {
   list(
     query: BatchListParams | null | undefined = {},
     options?: RequestOptions,
-  ): APIPromise<BatchListResponse> {
-    return this._client.get('/batches', { query, ...options });
+  ): PagePromise<BatchesPage, Batch> {
+    return this._client.getAPIList('/batches', CursorPage<Batch>, { query, ...options });
   }
 
   /**
@@ -40,6 +42,8 @@ export class Batches extends APIResource {
     return this._client.post(path`/batches/${batchID}/cancel`, options);
   }
 }
+
+export type BatchesPage = CursorPage<Batch>;
 
 export interface Batch {
   id: string;
@@ -137,12 +141,13 @@ export interface Batch {
    * Keys are strings with a maximum length of 64 characters. Values are strings with
    * a maximum length of 512 characters.
    */
-  metadata?: CompletionsAPI.Metadata | null;
+  metadata?: Shared.Metadata | null;
 
   /**
    * Model ID used to process the batch, like `gpt-5-2025-08-07`. OpenAI offers a
    * wide range of models with different capabilities, performance characteristics,
-   * and price points. Refer to the [model guide](/docs/models) to browse and compare
+   * and price points. Refer to the
+   * [model guide](https://platform.openai.com/docs/models) to browse and compare
    * available models.
    */
   model?: string;
@@ -155,136 +160,122 @@ export interface Batch {
   /**
    * The request counts for different statuses within the batch.
    */
-  request_counts?: Batch.RequestCounts;
+  request_counts?: BatchRequestCounts;
 
   /**
    * Represents token usage details including input tokens, output tokens, a
    * breakdown of output tokens, and the total tokens used. Only populated on batches
    * created after September 7, 2025.
    */
-  usage?: Batch.Usage;
+  usage?: BatchUsage;
 }
 
 export namespace Batch {
   export interface Errors {
-    data?: Array<Errors.Data>;
+    data?: Array<BatchesAPI.BatchError>;
 
     /**
      * The object type, which is always `list`.
      */
     object?: string;
   }
-
-  export namespace Errors {
-    export interface Data {
-      /**
-       * An error code identifying the error type.
-       */
-      code?: string;
-
-      /**
-       * The line number of the input file where the error occurred, if applicable.
-       */
-      line?: number | null;
-
-      /**
-       * A human-readable message providing more details about the error.
-       */
-      message?: string;
-
-      /**
-       * The name of the parameter that caused the error, if applicable.
-       */
-      param?: string | null;
-    }
-  }
-
-  /**
-   * The request counts for different statuses within the batch.
-   */
-  export interface RequestCounts {
-    /**
-     * Number of requests that have been completed successfully.
-     */
-    completed: number;
-
-    /**
-     * Number of requests that have failed.
-     */
-    failed: number;
-
-    /**
-     * Total number of requests in the batch.
-     */
-    total: number;
-  }
-
-  /**
-   * Represents token usage details including input tokens, output tokens, a
-   * breakdown of output tokens, and the total tokens used. Only populated on batches
-   * created after September 7, 2025.
-   */
-  export interface Usage {
-    /**
-     * The number of input tokens.
-     */
-    input_tokens: number;
-
-    /**
-     * A detailed breakdown of the input tokens.
-     */
-    input_tokens_details: Usage.InputTokensDetails;
-
-    /**
-     * The number of output tokens.
-     */
-    output_tokens: number;
-
-    /**
-     * A detailed breakdown of the output tokens.
-     */
-    output_tokens_details: Usage.OutputTokensDetails;
-
-    /**
-     * The total number of tokens used.
-     */
-    total_tokens: number;
-  }
-
-  export namespace Usage {
-    /**
-     * A detailed breakdown of the input tokens.
-     */
-    export interface InputTokensDetails {
-      /**
-       * The number of tokens that were retrieved from the cache.
-       * [More on prompt caching](/docs/guides/prompt-caching).
-       */
-      cached_tokens: number;
-    }
-
-    /**
-     * A detailed breakdown of the output tokens.
-     */
-    export interface OutputTokensDetails {
-      /**
-       * The number of reasoning tokens.
-       */
-      reasoning_tokens: number;
-    }
-  }
 }
 
-export interface BatchListResponse {
-  data: Array<Batch>;
+export interface BatchError {
+  /**
+   * An error code identifying the error type.
+   */
+  code?: string;
 
-  has_more: boolean;
+  /**
+   * The line number of the input file where the error occurred, if applicable.
+   */
+  line?: number | null;
 
-  object: 'list';
+  /**
+   * A human-readable message providing more details about the error.
+   */
+  message?: string;
 
-  first_id?: string;
+  /**
+   * The name of the parameter that caused the error, if applicable.
+   */
+  param?: string | null;
+}
 
-  last_id?: string;
+/**
+ * The request counts for different statuses within the batch.
+ */
+export interface BatchRequestCounts {
+  /**
+   * Number of requests that have been completed successfully.
+   */
+  completed: number;
+
+  /**
+   * Number of requests that have failed.
+   */
+  failed: number;
+
+  /**
+   * Total number of requests in the batch.
+   */
+  total: number;
+}
+
+/**
+ * Represents token usage details including input tokens, output tokens, a
+ * breakdown of output tokens, and the total tokens used. Only populated on batches
+ * created after September 7, 2025.
+ */
+export interface BatchUsage {
+  /**
+   * The number of input tokens.
+   */
+  input_tokens: number;
+
+  /**
+   * A detailed breakdown of the input tokens.
+   */
+  input_tokens_details: BatchUsage.InputTokensDetails;
+
+  /**
+   * The number of output tokens.
+   */
+  output_tokens: number;
+
+  /**
+   * A detailed breakdown of the output tokens.
+   */
+  output_tokens_details: BatchUsage.OutputTokensDetails;
+
+  /**
+   * The total number of tokens used.
+   */
+  total_tokens: number;
+}
+
+export namespace BatchUsage {
+  /**
+   * A detailed breakdown of the input tokens.
+   */
+  export interface InputTokensDetails {
+    /**
+     * The number of tokens that were retrieved from the cache.
+     * [More on prompt caching](https://platform.openai.com/docs/guides/prompt-caching).
+     */
+    cached_tokens: number;
+  }
+
+  /**
+   * A detailed breakdown of the output tokens.
+   */
+  export interface OutputTokensDetails {
+    /**
+     * The number of reasoning tokens.
+     */
+    reasoning_tokens: number;
+  }
 }
 
 export interface BatchCreateParams {
@@ -313,12 +304,13 @@ export interface BatchCreateParams {
   /**
    * The ID of an uploaded file that contains requests for the new batch.
    *
-   * See [upload file](/docs/api-reference/files/create) for how to upload a file.
+   * See [upload file](https://platform.openai.com/docs/api-reference/files/create)
+   * for how to upload a file.
    *
    * Your input file must be formatted as a
-   * [JSONL file](/docs/api-reference/batch/request-input), and must be uploaded with
-   * the purpose `batch`. The file can contain up to 50,000 requests, and can be up
-   * to 200 MB in size.
+   * [JSONL file](https://platform.openai.com/docs/api-reference/batch/request-input),
+   * and must be uploaded with the purpose `batch`. The file can contain up to 50,000
+   * requests, and can be up to 200 MB in size.
    */
   input_file_id: string;
 
@@ -330,7 +322,7 @@ export interface BatchCreateParams {
    * Keys are strings with a maximum length of 64 characters. Values are strings with
    * a maximum length of 512 characters.
    */
-  metadata?: CompletionsAPI.Metadata | null;
+  metadata?: Shared.Metadata | null;
 
   /**
    * The expiration policy for the output and/or error file that are generated for a
@@ -360,26 +352,15 @@ export namespace BatchCreateParams {
   }
 }
 
-export interface BatchListParams {
-  /**
-   * A cursor for use in pagination. `after` is an object ID that defines your place
-   * in the list. For instance, if you make a list request and receive 100 objects,
-   * ending with obj_foo, your subsequent call can include after=obj_foo in order to
-   * fetch the next page of the list.
-   */
-  after?: string;
-
-  /**
-   * A limit on the number of objects to be returned. Limit can range between 1 and
-   * 100, and the default is 20.
-   */
-  limit?: number;
-}
+export interface BatchListParams extends CursorPageParams {}
 
 export declare namespace Batches {
   export {
     type Batch as Batch,
-    type BatchListResponse as BatchListResponse,
+    type BatchError as BatchError,
+    type BatchRequestCounts as BatchRequestCounts,
+    type BatchUsage as BatchUsage,
+    type BatchesPage as BatchesPage,
     type BatchCreateParams as BatchCreateParams,
     type BatchListParams as BatchListParams,
   };

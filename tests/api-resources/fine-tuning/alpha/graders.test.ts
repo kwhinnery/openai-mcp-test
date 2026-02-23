@@ -1,15 +1,14 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import OpenAIMcpTest from 'openai-mcp-test';
+import OpenAI from 'openai-mcp-test';
 
-const client = new OpenAIMcpTest({
+const client = new OpenAI({
   apiKey: 'My API Key',
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
 describe('resource graders', () => {
-  // Mock server tests are disabled
-  test.skip('run: only required params', async () => {
+  test('run: only required params', async () => {
     const responsePromise = client.fineTuning.alpha.graders.run({
       grader: {
         input: 'input',
@@ -29,8 +28,7 @@ describe('resource graders', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('run: required and optional params', async () => {
+  test('run: required and optional params', async () => {
     const response = await client.fineTuning.alpha.graders.run({
       grader: {
         input: 'input',
@@ -44,8 +42,7 @@ describe('resource graders', () => {
     });
   });
 
-  // Mock server tests are disabled
-  test.skip('validate: only required params', async () => {
+  test('validate: only required params', async () => {
     const responsePromise = client.fineTuning.alpha.graders.validate({
       grader: {
         input: 'input',
@@ -64,8 +61,7 @@ describe('resource graders', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('validate: required and optional params', async () => {
+  test('validate: required and optional params', async () => {
     const response = await client.fineTuning.alpha.graders.validate({
       grader: {
         input: 'input',

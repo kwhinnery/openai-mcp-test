@@ -2,13 +2,13 @@
 
 import { castToError } from '../internal/errors';
 
-export class OpenAIMcpTestError extends Error {}
+export class OpenAIError extends Error {}
 
 export class APIError<
   TStatus extends number | undefined = number | undefined,
   THeaders extends Headers | undefined = Headers | undefined,
   TError extends Object | undefined = Object | undefined,
-> extends OpenAIMcpTestError {
+> extends OpenAIError {
   /** HTTP status for the response that caused the error */
   readonly status: TStatus;
   /** HTTP headers for the response that caused the error */
@@ -16,11 +16,23 @@ export class APIError<
   /** JSON body of the response that caused the error */
   readonly error: TError;
 
+  readonly code: string | null | undefined;
+  readonly param: string | null | undefined;
+  readonly type: string | undefined;
+
+  readonly requestID: string | null | undefined;
+
   constructor(status: TStatus, error: TError, message: string | undefined, headers: THeaders) {
     super(`${APIError.makeMessage(status, error, message)}`);
     this.status = status;
     this.headers = headers;
+    this.requestID = headers?.get('x-request-id');
     this.error = error;
+
+    const data = error as Record<string, any>;
+    this.code = data?.['code'];
+    this.param = data?.['param'];
+    this.type = data?.['type'];
   }
 
   private static makeMessage(status: number | undefined, error: any, message: string | undefined) {
@@ -54,7 +66,7 @@ export class APIError<
       return new APIConnectionError({ message, cause: castToError(errorResponse) });
     }
 
-    const error = errorResponse as Record<string, any>;
+    const error = (errorResponse as Record<string, any>)?.['error'];
 
     if (status === 400) {
       return new BadRequestError(status, error, message, headers);

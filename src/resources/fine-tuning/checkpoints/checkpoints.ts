@@ -3,11 +3,13 @@
 import { APIResource } from '../../../core/resource';
 import * as PermissionsAPI from './permissions';
 import {
-  ListFineTuningCheckpointPermissionResponse,
   PermissionCreateParams,
+  PermissionCreateResponse,
+  PermissionCreateResponsesPage,
   PermissionDeleteParams,
   PermissionDeleteResponse,
   PermissionRetrieveParams,
+  PermissionRetrieveResponse,
   Permissions,
 } from './permissions';
 
@@ -20,8 +22,10 @@ Checkpoints.Permissions = Permissions;
 export declare namespace Checkpoints {
   export {
     Permissions as Permissions,
-    type ListFineTuningCheckpointPermissionResponse as ListFineTuningCheckpointPermissionResponse,
+    type PermissionCreateResponse as PermissionCreateResponse,
+    type PermissionRetrieveResponse as PermissionRetrieveResponse,
     type PermissionDeleteResponse as PermissionDeleteResponse,
+    type PermissionCreateResponsesPage as PermissionCreateResponsesPage,
     type PermissionCreateParams as PermissionCreateParams,
     type PermissionRetrieveParams as PermissionRetrieveParams,
     type PermissionDeleteParams as PermissionDeleteParams,

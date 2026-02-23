@@ -3,9 +3,11 @@
 export { Checkpoints } from './checkpoints';
 export {
   Permissions,
-  type ListFineTuningCheckpointPermissionResponse,
+  type PermissionCreateResponse,
+  type PermissionRetrieveResponse,
   type PermissionDeleteResponse,
   type PermissionCreateParams,
   type PermissionRetrieveParams,
   type PermissionDeleteParams,
+  type PermissionCreateResponsesPage,
 } from './permissions';

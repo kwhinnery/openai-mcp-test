@@ -2,22 +2,21 @@
 
 export {
   Containers,
-  type ContainerResource,
-  type InlineSkillParam,
-  type NetworkPolicyAllowlistParam,
-  type NetworkPolicyDisabledParam,
-  type SkillReferenceParam,
+  type ContainerCreateResponse,
+  type ContainerRetrieveResponse,
   type ContainerListResponse,
   type ContainerCreateParams,
   type ContainerListParams,
+  type ContainerListResponsesPage,
 } from './containers';
 export {
   Files,
-  type ContainerFileResource,
+  type FileCreateResponse,
+  type FileRetrieveResponse,
   type FileListResponse,
   type FileCreateParams,
   type FileRetrieveParams,
   type FileListParams,
   type FileDeleteParams,
-  type FileRetrieveContentParams,
-} from './files';
+  type FileListResponsesPage,
+} from './files/index';

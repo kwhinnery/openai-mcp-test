@@ -2,7 +2,9 @@
 
 import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
+import { ConversationCursorPage, type ConversationCursorPageParams, PagePromise } from '../core/pagination';
 import { type Uploadable } from '../core/uploads';
+import { buildHeaders } from '../internal/headers';
 import { RequestOptions } from '../internal/request-options';
 import { maybeMultipartFormRequestOptions } from '../internal/uploads';
 import { path } from '../internal/utils/path';
@@ -11,14 +13,14 @@ export class Videos extends APIResource {
   /**
    * Create a new video generation job from a prompt and optional reference assets.
    */
-  create(body: VideoCreateParams, options?: RequestOptions): APIPromise<VideoResource> {
+  create(body: VideoCreateParams, options?: RequestOptions): APIPromise<Video> {
     return this._client.post('/videos', maybeMultipartFormRequestOptions({ body, ...options }, this._client));
   }
 
   /**
    * Fetch the latest metadata for a generated video.
    */
-  retrieve(videoID: string, options?: RequestOptions): APIPromise<VideoResource> {
+  retrieve(videoID: string, options?: RequestOptions): APIPromise<Video> {
     return this._client.get(path`/videos/${videoID}`, options);
   }
 
@@ -28,8 +30,8 @@ export class Videos extends APIResource {
   list(
     query: VideoListParams | null | undefined = {},
     options?: RequestOptions,
-  ): APIPromise<VideoListResponse> {
-    return this._client.get('/videos', { query, ...options });
+  ): PagePromise<VideosPage, Video> {
+    return this._client.getAPIList('/videos', ConversationCursorPage<Video>, { query, ...options });
   }
 
   /**
@@ -37,20 +39,6 @@ export class Videos extends APIResource {
    */
   delete(videoID: string, options?: RequestOptions): APIPromise<VideoDeleteResponse> {
     return this._client.delete(path`/videos/${videoID}`, options);
-  }
-
-  /**
-   * Create a remix of a completed video using a refreshed prompt.
-   */
-  createRemix(
-    videoID: string,
-    body: VideoCreateRemixParams,
-    options?: RequestOptions,
-  ): APIPromise<VideoResource> {
-    return this._client.post(
-      path`/videos/${videoID}/remix`,
-      maybeMultipartFormRequestOptions({ body, ...options }, this._client),
-    );
   }
 
   /**
@@ -62,25 +50,32 @@ export class Videos extends APIResource {
     videoID: string,
     query: VideoDownloadContentParams | null | undefined = {},
     options?: RequestOptions,
-  ): APIPromise<string> {
-    return this._client.get(path`/videos/${videoID}/content`, { query, ...options });
+  ): APIPromise<Response> {
+    return this._client.get(path`/videos/${videoID}/content`, {
+      query,
+      ...options,
+      headers: buildHeaders([{ Accept: 'application/binary' }, options?.headers]),
+      __binaryResponse: true,
+    });
+  }
+
+  /**
+   * Create a remix of a completed video using a refreshed prompt.
+   */
+  remix(videoID: string, body: VideoRemixParams, options?: RequestOptions): APIPromise<Video> {
+    return this._client.post(
+      path`/videos/${videoID}/remix`,
+      maybeMultipartFormRequestOptions({ body, ...options }, this._client),
+    );
   }
 }
 
-export type OrderEnum = 'asc' | 'desc';
-
-export type VideoModel =
-  | (string & {})
-  | 'sora-2'
-  | 'sora-2-pro'
-  | 'sora-2-2025-10-06'
-  | 'sora-2-pro-2025-10-06'
-  | 'sora-2-2025-12-08';
+export type VideosPage = ConversationCursorPage<Video>;
 
 /**
  * Structured information describing a generated video job.
  */
-export interface VideoResource {
+export interface Video {
   /**
    * Unique identifier for the video job.
    */
@@ -99,7 +94,7 @@ export interface VideoResource {
   /**
    * Error payload that explains why generation failed, if applicable.
    */
-  error: VideoResource.Error | null;
+  error: VideoCreateError | null;
 
   /**
    * Unix timestamp (seconds) for when the downloadable assets expire, if set.
@@ -147,53 +142,32 @@ export interface VideoResource {
   status: 'queued' | 'in_progress' | 'completed' | 'failed';
 }
 
-export namespace VideoResource {
+/**
+ * An error that occurred while generating the response.
+ */
+export interface VideoCreateError {
   /**
-   * Error payload that explains why generation failed, if applicable.
+   * A machine-readable error code that was returned.
    */
-  export interface Error {
-    /**
-     * A machine-readable error code that was returned.
-     */
-    code: string;
+  code: string;
 
-    /**
-     * A human-readable description of the error that was returned.
-     */
-    message: string;
-  }
+  /**
+   * A human-readable description of the error that was returned.
+   */
+  message: string;
 }
+
+export type VideoModel =
+  | (string & {})
+  | 'sora-2'
+  | 'sora-2-pro'
+  | 'sora-2-2025-10-06'
+  | 'sora-2-pro-2025-10-06'
+  | 'sora-2-2025-12-08';
 
 export type VideoSeconds = '4' | '8' | '12';
 
 export type VideoSize = '720x1280' | '1280x720' | '1024x1792' | '1792x1024';
-
-export interface VideoListResponse {
-  /**
-   * A list of items
-   */
-  data: Array<VideoResource>;
-
-  /**
-   * The ID of the first item in the list.
-   */
-  first_id: string | null;
-
-  /**
-   * Whether there are more items available.
-   */
-  has_more: boolean;
-
-  /**
-   * The ID of the last item in the list.
-   */
-  last_id: string | null;
-
-  /**
-   * The type of object returned, must be `list`.
-   */
-  object: 'list';
-}
 
 /**
  * Confirmation payload returned after deleting a video.
@@ -214,8 +188,6 @@ export interface VideoDeleteResponse {
    */
   object: 'video.deleted';
 }
-
-export type VideoDownloadContentResponse = string;
 
 export interface VideoCreateParams {
   /**
@@ -246,29 +218,12 @@ export interface VideoCreateParams {
   size?: VideoSize;
 }
 
-export interface VideoListParams {
-  /**
-   * Identifier for the last item from the previous pagination request
-   */
-  after?: string;
-
-  /**
-   * Number of items to retrieve
-   */
-  limit?: number;
-
+export interface VideoListParams extends ConversationCursorPageParams {
   /**
    * Sort order of results by timestamp. Use `asc` for ascending order or `desc` for
    * descending order.
    */
-  order?: OrderEnum;
-}
-
-export interface VideoCreateRemixParams {
-  /**
-   * Updated text prompt that directs the remix generation.
-   */
-  prompt: string;
+  order?: 'asc' | 'desc';
 }
 
 export interface VideoDownloadContentParams {
@@ -278,19 +233,25 @@ export interface VideoDownloadContentParams {
   variant?: 'video' | 'thumbnail' | 'spritesheet';
 }
 
+export interface VideoRemixParams {
+  /**
+   * Updated text prompt that directs the remix generation.
+   */
+  prompt: string;
+}
+
 export declare namespace Videos {
   export {
-    type OrderEnum as OrderEnum,
+    type Video as Video,
+    type VideoCreateError as VideoCreateError,
     type VideoModel as VideoModel,
-    type VideoResource as VideoResource,
     type VideoSeconds as VideoSeconds,
     type VideoSize as VideoSize,
-    type VideoListResponse as VideoListResponse,
     type VideoDeleteResponse as VideoDeleteResponse,
-    type VideoDownloadContentResponse as VideoDownloadContentResponse,
+    type VideosPage as VideosPage,
     type VideoCreateParams as VideoCreateParams,
     type VideoListParams as VideoListParams,
-    type VideoCreateRemixParams as VideoCreateRemixParams,
     type VideoDownloadContentParams as VideoDownloadContentParams,
+    type VideoRemixParams as VideoRemixParams,
   };
 }

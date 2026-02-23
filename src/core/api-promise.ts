@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { type OpenAIMcpTest } from '../client';
+import { type OpenAI } from '../client';
 
 import { type PromiseOrValue } from '../internal/types';
 import { APIResponseProps, defaultParseResponse } from '../internal/parse';
@@ -11,13 +11,13 @@ import { APIResponseProps, defaultParseResponse } from '../internal/parse';
  */
 export class APIPromise<T> extends Promise<T> {
   private parsedPromise: Promise<T> | undefined;
-  #client: OpenAIMcpTest;
+  #client: OpenAI;
 
   constructor(
-    client: OpenAIMcpTest,
+    client: OpenAI,
     private responsePromise: Promise<APIResponseProps>,
     private parseResponse: (
-      client: OpenAIMcpTest,
+      client: OpenAI,
       props: APIResponseProps,
     ) => PromiseOrValue<T> = defaultParseResponse,
   ) {
