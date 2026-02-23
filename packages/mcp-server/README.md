@@ -7,8 +7,8 @@
 Because it's not published yet, clone the repo and build it:
 
 ```sh
-git clone git@github.com:stainless-sdks/openai-mcp-test-typescript.git
-cd openai-mcp-test-typescript
+git clone git@github.com:kwhinnery/openai-mcp-test.git
+cd openai-mcp-test
 ./scripts/bootstrap
 ./scripts/build
 ```
@@ -41,7 +41,7 @@ For clients with a configuration JSON, it might look something like this:
   "mcpServers": {
     "openai_mcp_test_api": {
       "command": "node",
-      "args": ["/path/to/local/openai-mcp-test-typescript/packages/mcp-server"],
+      "args": ["/path/to/local/openai-mcp-test/packages/mcp-server"],
       "env": {
         "OPENAI_API_KEY": "My API Key",
         "OPENAI_ORG_ID": "My Organization",
