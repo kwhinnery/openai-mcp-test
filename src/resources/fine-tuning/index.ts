@@ -5,13 +5,23 @@ export { Checkpoints } from './checkpoints/index';
 export { FineTuning } from './fine-tuning';
 export {
   Jobs,
-  type FineTuneMethod,
   type FineTuningJob,
-  type JobListResponse,
-  type JobListCheckpointsResponse,
-  type JobListEventsResponse,
+  type FineTuningJobEvent,
+  type FineTuningJobWandbIntegration,
+  type FineTuningJobWandbIntegrationObject,
+  type FineTuningJobIntegration,
   type JobCreateParams,
   type JobListParams,
-  type JobListCheckpointsParams,
   type JobListEventsParams,
-} from './jobs';
+  type FineTuningJobsPage,
+  type FineTuningJobEventsPage,
+} from './jobs/index';
+export {
+  Methods,
+  type DpoHyperparameters,
+  type DpoMethod,
+  type ReinforcementHyperparameters,
+  type ReinforcementMethod,
+  type SupervisedHyperparameters,
+  type SupervisedMethod,
+} from './methods';

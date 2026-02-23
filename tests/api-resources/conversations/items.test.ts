@@ -1,15 +1,14 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import OpenAIMcpTest from 'openai-mcp-test';
+import OpenAI from 'openai-mcp-test';
 
-const client = new OpenAIMcpTest({
+const client = new OpenAI({
   apiKey: 'My API Key',
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
 describe('resource items', () => {
-  // Mock server tests are disabled
-  test.skip('create: only required params', async () => {
+  test('create: only required params', async () => {
     const responsePromise = client.conversations.items.create('conv_123', {
       items: [
         {
@@ -28,8 +27,7 @@ describe('resource items', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('create: required and optional params', async () => {
+  test('create: required and optional params', async () => {
     const response = await client.conversations.items.create('conv_123', {
       items: [
         {
@@ -42,8 +40,7 @@ describe('resource items', () => {
     });
   });
 
-  // Mock server tests are disabled
-  test.skip('retrieve: only required params', async () => {
+  test('retrieve: only required params', async () => {
     const responsePromise = client.conversations.items.retrieve('msg_abc', { conversation_id: 'conv_123' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -54,16 +51,14 @@ describe('resource items', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('retrieve: required and optional params', async () => {
+  test('retrieve: required and optional params', async () => {
     const response = await client.conversations.items.retrieve('msg_abc', {
       conversation_id: 'conv_123',
       include: ['file_search_call.results'],
     });
   });
 
-  // Mock server tests are disabled
-  test.skip('list', async () => {
+  test('list', async () => {
     const responsePromise = client.conversations.items.list('conv_123');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -74,8 +69,7 @@ describe('resource items', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('list: request options and params are passed correctly', async () => {
+  test('list: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.conversations.items.list(
@@ -88,11 +82,10 @@ describe('resource items', () => {
         },
         { path: '/_stainless_unknown_path' },
       ),
-    ).rejects.toThrow(OpenAIMcpTest.NotFoundError);
+    ).rejects.toThrow(OpenAI.NotFoundError);
   });
 
-  // Mock server tests are disabled
-  test.skip('delete: only required params', async () => {
+  test('delete: only required params', async () => {
     const responsePromise = client.conversations.items.delete('msg_abc', { conversation_id: 'conv_123' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -103,8 +96,7 @@ describe('resource items', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('delete: required and optional params', async () => {
+  test('delete: required and optional params', async () => {
     const response = await client.conversations.items.delete('msg_abc', { conversation_id: 'conv_123' });
   });
 });

@@ -1,8 +1,8 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { OpenAIMcpTest } from 'openai-mcp-test';
+import { OpenAI } from 'openai-mcp-test';
 
-const { stringifyQuery } = OpenAIMcpTest.prototype as any;
+const { stringifyQuery } = OpenAI.prototype as any;
 
 describe(stringifyQuery, () => {
   for (const [input, expected] of [

@@ -3,13 +3,6 @@
 export { Alpha } from './alpha';
 export {
   Graders,
-  type EvalItem,
-  type EvalItemContentItem,
-  type GraderMulti,
-  type GraderPythonScript,
-  type GraderScoreAssignmentModel,
-  type GraderStringCheckFineTuning,
-  type GraderTextSimilarityFineTuning,
   type GraderRunResponse,
   type GraderValidateResponse,
   type GraderRunParams,

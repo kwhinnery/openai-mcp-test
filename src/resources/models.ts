@@ -2,6 +2,7 @@
 
 import { APIResource } from '../core/resource';
 import { APIPromise } from '../core/api-promise';
+import { Page, PagePromise } from '../core/pagination';
 import { RequestOptions } from '../internal/request-options';
 import { path } from '../internal/utils/path';
 
@@ -18,18 +19,21 @@ export class Models extends APIResource {
    * Lists the currently available models, and provides basic information about each
    * one such as the owner and availability.
    */
-  list(options?: RequestOptions): APIPromise<ModelListResponse> {
-    return this._client.get('/models', options);
+  list(options?: RequestOptions): PagePromise<ModelsPage, Model> {
+    return this._client.getAPIList('/models', Page<Model>, options);
   }
 
   /**
    * Delete a fine-tuned model. You must have the Owner role in your organization to
    * delete a model.
    */
-  delete(model: string, options?: RequestOptions): APIPromise<ModelDeleteResponse> {
+  delete(model: string, options?: RequestOptions): APIPromise<ModelDeleted> {
     return this._client.delete(path`/models/${model}`, options);
   }
 }
+
+// Note: no pagination actually occurs yet, this is for forwards-compatibility.
+export type ModelsPage = Page<Model>;
 
 /**
  * Describes an OpenAI model offering that can be used with the API.
@@ -56,13 +60,7 @@ export interface Model {
   owned_by: string;
 }
 
-export interface ModelListResponse {
-  data: Array<Model>;
-
-  object: 'list';
-}
-
-export interface ModelDeleteResponse {
+export interface ModelDeleted {
   id: string;
 
   deleted: boolean;
@@ -71,9 +69,5 @@ export interface ModelDeleteResponse {
 }
 
 export declare namespace Models {
-  export {
-    type Model as Model,
-    type ModelListResponse as ModelListResponse,
-    type ModelDeleteResponse as ModelDeleteResponse,
-  };
+  export { type Model as Model, type ModelDeleted as ModelDeleted, type ModelsPage as ModelsPage };
 }

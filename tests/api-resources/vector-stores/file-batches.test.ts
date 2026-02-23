@@ -1,15 +1,14 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import OpenAIMcpTest from 'openai-mcp-test';
+import OpenAI from 'openai-mcp-test';
 
-const client = new OpenAIMcpTest({
+const client = new OpenAI({
   apiKey: 'My API Key',
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
 describe('resource fileBatches', () => {
-  // Mock server tests are disabled
-  test.skip('create', async () => {
+  test('create', async () => {
     const responsePromise = client.vectorStores.fileBatches.create('vs_abc123', {});
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -20,8 +19,7 @@ describe('resource fileBatches', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('retrieve: only required params', async () => {
+  test('retrieve: only required params', async () => {
     const responsePromise = client.vectorStores.fileBatches.retrieve('vsfb_abc123', {
       vector_store_id: 'vs_abc123',
     });
@@ -34,15 +32,13 @@ describe('resource fileBatches', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('retrieve: required and optional params', async () => {
+  test('retrieve: required and optional params', async () => {
     const response = await client.vectorStores.fileBatches.retrieve('vsfb_abc123', {
       vector_store_id: 'vs_abc123',
     });
   });
 
-  // Mock server tests are disabled
-  test.skip('cancel: only required params', async () => {
+  test('cancel: only required params', async () => {
     const responsePromise = client.vectorStores.fileBatches.cancel('batch_id', {
       vector_store_id: 'vector_store_id',
     });
@@ -55,15 +51,13 @@ describe('resource fileBatches', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('cancel: required and optional params', async () => {
+  test('cancel: required and optional params', async () => {
     const response = await client.vectorStores.fileBatches.cancel('batch_id', {
       vector_store_id: 'vector_store_id',
     });
   });
 
-  // Mock server tests are disabled
-  test.skip('listFiles: only required params', async () => {
+  test('listFiles: only required params', async () => {
     const responsePromise = client.vectorStores.fileBatches.listFiles('batch_id', {
       vector_store_id: 'vector_store_id',
     });
@@ -76,8 +70,7 @@ describe('resource fileBatches', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('listFiles: required and optional params', async () => {
+  test('listFiles: required and optional params', async () => {
     const response = await client.vectorStores.fileBatches.listFiles('batch_id', {
       vector_store_id: 'vector_store_id',
       after: 'after',

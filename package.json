@@ -1,14 +1,14 @@
 {
   "name": "openai-mcp-test",
   "version": "0.0.1",
-  "description": "The official TypeScript library for the OpenAI Mcp Test API",
-  "author": "OpenAI Mcp Test <>",
+  "description": "The official TypeScript library for the OpenAI API",
+  "author": "OpenAI <support@openai.com>",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "type": "commonjs",
-  "repository": "github:stainless-sdks/openai-mcp-test-typescript",
-  "license": "MIT",
-  "packageManager": "pnpm@10.27.0",
+  "repository": "github:openai-mcp-test/openai-node",
+  "license": "Apache-2.0",
+  "packageManager": "yarn@1.22.22",
   "files": [
     "**/*"
   ],
@@ -19,7 +19,7 @@
   "scripts": {
     "test": "./scripts/test",
     "build": "./scripts/build",
-    "prepublishOnly": "echo 'to publish, run pnpm build && (cd dist; pnpm publish)' && exit 1",
+    "prepublishOnly": "echo 'to publish, run yarn build && (cd dist; yarn publish)' && exit 1",
     "format": "./scripts/format",
     "prepare": "if ./scripts/utils/check-is-in-git-install.sh; then ./scripts/build && ./scripts/utils/git-swap.sh; fi",
     "tsn": "ts-node -r tsconfig-paths/register",
@@ -49,6 +49,9 @@
     "tslib": "^2.8.1",
     "typescript": "5.8.3",
     "typescript-eslint": "8.31.1"
+  },
+  "bin": {
+    "openai-mcp-test": "bin/cli"
   },
   "exports": {
     ".": {

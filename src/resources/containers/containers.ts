@@ -1,18 +1,21 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../../core/resource';
-import * as FilesAPI from './files';
+import * as ResponsesAPI from '../responses/responses';
+import * as FilesAPI from './files/files';
 import {
-  ContainerFileResource,
   FileCreateParams,
+  FileCreateResponse,
   FileDeleteParams,
   FileListParams,
   FileListResponse,
-  FileRetrieveContentParams,
+  FileListResponsesPage,
   FileRetrieveParams,
+  FileRetrieveResponse,
   Files,
-} from './files';
+} from './files/files';
 import { APIPromise } from '../../core/api-promise';
+import { CursorPage, type CursorPageParams, PagePromise } from '../../core/pagination';
 import { buildHeaders } from '../../internal/headers';
 import { RequestOptions } from '../../internal/request-options';
 import { path } from '../../internal/utils/path';
@@ -21,31 +24,31 @@ export class Containers extends APIResource {
   files: FilesAPI.Files = new FilesAPI.Files(this._client);
 
   /**
-   * Creates a container.
+   * Create Container
    */
-  create(body: ContainerCreateParams, options?: RequestOptions): APIPromise<ContainerResource> {
+  create(body: ContainerCreateParams, options?: RequestOptions): APIPromise<ContainerCreateResponse> {
     return this._client.post('/containers', { body, ...options });
   }
 
   /**
-   * Retrieves a container.
+   * Retrieve Container
    */
-  retrieve(containerID: string, options?: RequestOptions): APIPromise<ContainerResource> {
+  retrieve(containerID: string, options?: RequestOptions): APIPromise<ContainerRetrieveResponse> {
     return this._client.get(path`/containers/${containerID}`, options);
   }
 
   /**
-   * Lists containers.
+   * List Containers
    */
   list(
     query: ContainerListParams | null | undefined = {},
     options?: RequestOptions,
-  ): APIPromise<ContainerListResponse> {
-    return this._client.get('/containers', { query, ...options });
+  ): PagePromise<ContainerListResponsesPage, ContainerListResponse> {
+    return this._client.getAPIList('/containers', CursorPage<ContainerListResponse>, { query, ...options });
   }
 
   /**
-   * Delete a container.
+   * Delete Container
    */
   delete(containerID: string, options?: RequestOptions): APIPromise<void> {
     return this._client.delete(path`/containers/${containerID}`, {
@@ -55,7 +58,9 @@ export class Containers extends APIResource {
   }
 }
 
-export interface ContainerResource {
+export type ContainerListResponsesPage = CursorPage<ContainerListResponse>;
+
+export interface ContainerCreateResponse {
   /**
    * Unique identifier for the container.
    */
@@ -86,7 +91,7 @@ export interface ContainerResource {
    * point for the expiration. The minutes is the number of minutes after the anchor
    * before the container expires.
    */
-  expires_after?: ContainerResource.ExpiresAfter;
+  expires_after?: ContainerCreateResponse.ExpiresAfter;
 
   /**
    * Unix timestamp (in seconds) when the container was last active.
@@ -101,10 +106,10 @@ export interface ContainerResource {
   /**
    * Network access policy for the container.
    */
-  network_policy?: ContainerResource.NetworkPolicy;
+  network_policy?: ContainerCreateResponse.NetworkPolicy;
 }
 
-export namespace ContainerResource {
+export namespace ContainerCreateResponse {
   /**
    * The container will expire after this time period. The anchor is the reference
    * point for the expiration. The minutes is the number of minutes after the anchor
@@ -138,135 +143,170 @@ export namespace ContainerResource {
   }
 }
 
-export interface InlineSkillParam {
+export interface ContainerRetrieveResponse {
   /**
-   * The description of the skill.
+   * Unique identifier for the container.
    */
-  description: string;
+  id: string;
 
   /**
-   * The name of the skill.
+   * Unix timestamp (in seconds) when the container was created.
+   */
+  created_at: number;
+
+  /**
+   * Name of the container.
    */
   name: string;
 
   /**
-   * Inline skill payload
+   * The type of this object.
    */
-  source: InlineSkillParam.Source;
+  object: string;
 
   /**
-   * Defines an inline skill for this request.
+   * Status of the container (e.g., active, deleted).
    */
-  type: 'inline';
+  status: string;
+
+  /**
+   * The container will expire after this time period. The anchor is the reference
+   * point for the expiration. The minutes is the number of minutes after the anchor
+   * before the container expires.
+   */
+  expires_after?: ContainerRetrieveResponse.ExpiresAfter;
+
+  /**
+   * Unix timestamp (in seconds) when the container was last active.
+   */
+  last_active_at?: number;
+
+  /**
+   * The memory limit configured for the container.
+   */
+  memory_limit?: '1g' | '4g' | '16g' | '64g';
+
+  /**
+   * Network access policy for the container.
+   */
+  network_policy?: ContainerRetrieveResponse.NetworkPolicy;
 }
 
-export namespace InlineSkillParam {
+export namespace ContainerRetrieveResponse {
   /**
-   * Inline skill payload
+   * The container will expire after this time period. The anchor is the reference
+   * point for the expiration. The minutes is the number of minutes after the anchor
+   * before the container expires.
    */
-  export interface Source {
+  export interface ExpiresAfter {
     /**
-     * Base64-encoded skill zip bundle.
+     * The reference point for the expiration.
      */
-    data: string;
+    anchor?: 'last_active_at';
 
     /**
-     * The media type of the inline skill payload. Must be `application/zip`.
+     * The number of minutes after the anchor before the container expires.
      */
-    media_type: 'application/zip';
-
-    /**
-     * The type of the inline skill source. Must be `base64`.
-     */
-    type: 'base64';
+    minutes?: number;
   }
-}
-
-export interface NetworkPolicyAllowlistParam {
-  /**
-   * A list of allowed domains when type is `allowlist`.
-   */
-  allowed_domains: Array<string>;
 
   /**
-   * Allow outbound network access only to specified domains. Always `allowlist`.
+   * Network access policy for the container.
    */
-  type: 'allowlist';
-
-  /**
-   * Optional domain-scoped secrets for allowlisted domains.
-   */
-  domain_secrets?: Array<NetworkPolicyAllowlistParam.DomainSecret>;
-}
-
-export namespace NetworkPolicyAllowlistParam {
-  export interface DomainSecret {
+  export interface NetworkPolicy {
     /**
-     * The domain associated with the secret.
+     * The network policy mode.
      */
-    domain: string;
+    type: 'allowlist' | 'disabled';
 
     /**
-     * The name of the secret to inject for the domain.
+     * Allowed outbound domains when `type` is `allowlist`.
      */
-    name: string;
-
-    /**
-     * The secret value to inject for the domain.
-     */
-    value: string;
+    allowed_domains?: Array<string>;
   }
-}
-
-export interface NetworkPolicyDisabledParam {
-  /**
-   * Disable outbound network access. Always `disabled`.
-   */
-  type: 'disabled';
-}
-
-export interface SkillReferenceParam {
-  /**
-   * The ID of the referenced skill.
-   */
-  skill_id: string;
-
-  /**
-   * References a skill created with the /v1/skills endpoint.
-   */
-  type: 'skill_reference';
-
-  /**
-   * Optional skill version. Use a positive integer or 'latest'. Omit for default.
-   */
-  version?: string;
 }
 
 export interface ContainerListResponse {
   /**
-   * A list of containers.
+   * Unique identifier for the container.
    */
-  data: Array<ContainerResource>;
+  id: string;
 
   /**
-   * The ID of the first container in the list.
+   * Unix timestamp (in seconds) when the container was created.
    */
-  first_id: string;
+  created_at: number;
 
   /**
-   * Whether there are more containers available.
+   * Name of the container.
    */
-  has_more: boolean;
+  name: string;
 
   /**
-   * The ID of the last container in the list.
+   * The type of this object.
    */
-  last_id: string;
+  object: string;
 
   /**
-   * The type of object returned, must be 'list'.
+   * Status of the container (e.g., active, deleted).
    */
-  object: 'list';
+  status: string;
+
+  /**
+   * The container will expire after this time period. The anchor is the reference
+   * point for the expiration. The minutes is the number of minutes after the anchor
+   * before the container expires.
+   */
+  expires_after?: ContainerListResponse.ExpiresAfter;
+
+  /**
+   * Unix timestamp (in seconds) when the container was last active.
+   */
+  last_active_at?: number;
+
+  /**
+   * The memory limit configured for the container.
+   */
+  memory_limit?: '1g' | '4g' | '16g' | '64g';
+
+  /**
+   * Network access policy for the container.
+   */
+  network_policy?: ContainerListResponse.NetworkPolicy;
+}
+
+export namespace ContainerListResponse {
+  /**
+   * The container will expire after this time period. The anchor is the reference
+   * point for the expiration. The minutes is the number of minutes after the anchor
+   * before the container expires.
+   */
+  export interface ExpiresAfter {
+    /**
+     * The reference point for the expiration.
+     */
+    anchor?: 'last_active_at';
+
+    /**
+     * The number of minutes after the anchor before the container expires.
+     */
+    minutes?: number;
+  }
+
+  /**
+   * Network access policy for the container.
+   */
+  export interface NetworkPolicy {
+    /**
+     * The network policy mode.
+     */
+    type: 'allowlist' | 'disabled';
+
+    /**
+     * Allowed outbound domains when `type` is `allowlist`.
+     */
+    allowed_domains?: Array<string>;
+  }
 }
 
 export interface ContainerCreateParams {
@@ -293,12 +333,12 @@ export interface ContainerCreateParams {
   /**
    * Network access policy for the container.
    */
-  network_policy?: NetworkPolicyDisabledParam | NetworkPolicyAllowlistParam;
+  network_policy?: ResponsesAPI.ContainerNetworkPolicyDisabled | ResponsesAPI.ContainerNetworkPolicyAllowlist;
 
   /**
    * An optional list of skills referenced by id or inline data.
    */
-  skills?: Array<SkillReferenceParam | InlineSkillParam>;
+  skills?: Array<ResponsesAPI.SkillReference | ResponsesAPI.InlineSkill>;
 }
 
 export namespace ContainerCreateParams {
@@ -316,21 +356,7 @@ export namespace ContainerCreateParams {
   }
 }
 
-export interface ContainerListParams {
-  /**
-   * A cursor for use in pagination. `after` is an object ID that defines your place
-   * in the list. For instance, if you make a list request and receive 100 objects,
-   * ending with obj_foo, your subsequent call can include after=obj_foo in order to
-   * fetch the next page of the list.
-   */
-  after?: string;
-
-  /**
-   * A limit on the number of objects to be returned. Limit can range between 1 and
-   * 100, and the default is 20.
-   */
-  limit?: number;
-
+export interface ContainerListParams extends CursorPageParams {
   /**
    * Filter results by container name.
    */
@@ -347,24 +373,23 @@ Containers.Files = Files;
 
 export declare namespace Containers {
   export {
-    type ContainerResource as ContainerResource,
-    type InlineSkillParam as InlineSkillParam,
-    type NetworkPolicyAllowlistParam as NetworkPolicyAllowlistParam,
-    type NetworkPolicyDisabledParam as NetworkPolicyDisabledParam,
-    type SkillReferenceParam as SkillReferenceParam,
+    type ContainerCreateResponse as ContainerCreateResponse,
+    type ContainerRetrieveResponse as ContainerRetrieveResponse,
     type ContainerListResponse as ContainerListResponse,
+    type ContainerListResponsesPage as ContainerListResponsesPage,
     type ContainerCreateParams as ContainerCreateParams,
     type ContainerListParams as ContainerListParams,
   };
 
   export {
     Files as Files,
-    type ContainerFileResource as ContainerFileResource,
+    type FileCreateResponse as FileCreateResponse,
+    type FileRetrieveResponse as FileRetrieveResponse,
     type FileListResponse as FileListResponse,
+    type FileListResponsesPage as FileListResponsesPage,
     type FileCreateParams as FileCreateParams,
     type FileRetrieveParams as FileRetrieveParams,
     type FileListParams as FileListParams,
     type FileDeleteParams as FileDeleteParams,
-    type FileRetrieveContentParams as FileRetrieveContentParams,
   };
 }

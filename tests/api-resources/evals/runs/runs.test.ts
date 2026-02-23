@@ -1,15 +1,14 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import OpenAIMcpTest from 'openai-mcp-test';
+import OpenAI from 'openai-mcp-test';
 
-const client = new OpenAIMcpTest({
+const client = new OpenAI({
   apiKey: 'My API Key',
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
 describe('resource runs', () => {
-  // Mock server tests are disabled
-  test.skip('create: only required params', async () => {
+  test('create: only required params', async () => {
     const responsePromise = client.evals.runs.create('eval_id', {
       data_source: {
         source: { content: [{ item: { foo: 'bar' } }], type: 'file_content' },
@@ -25,8 +24,7 @@ describe('resource runs', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('create: required and optional params', async () => {
+  test('create: required and optional params', async () => {
     const response = await client.evals.runs.create('eval_id', {
       data_source: {
         source: {
@@ -45,8 +43,7 @@ describe('resource runs', () => {
     });
   });
 
-  // Mock server tests are disabled
-  test.skip('retrieve: only required params', async () => {
+  test('retrieve: only required params', async () => {
     const responsePromise = client.evals.runs.retrieve('run_id', { eval_id: 'eval_id' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -57,13 +54,11 @@ describe('resource runs', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('retrieve: required and optional params', async () => {
+  test('retrieve: required and optional params', async () => {
     const response = await client.evals.runs.retrieve('run_id', { eval_id: 'eval_id' });
   });
 
-  // Mock server tests are disabled
-  test.skip('list', async () => {
+  test('list', async () => {
     const responsePromise = client.evals.runs.list('eval_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -74,8 +69,7 @@ describe('resource runs', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('list: request options and params are passed correctly', async () => {
+  test('list: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.evals.runs.list(
@@ -88,11 +82,10 @@ describe('resource runs', () => {
         },
         { path: '/_stainless_unknown_path' },
       ),
-    ).rejects.toThrow(OpenAIMcpTest.NotFoundError);
+    ).rejects.toThrow(OpenAI.NotFoundError);
   });
 
-  // Mock server tests are disabled
-  test.skip('delete: only required params', async () => {
+  test('delete: only required params', async () => {
     const responsePromise = client.evals.runs.delete('run_id', { eval_id: 'eval_id' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -103,13 +96,11 @@ describe('resource runs', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('delete: required and optional params', async () => {
+  test('delete: required and optional params', async () => {
     const response = await client.evals.runs.delete('run_id', { eval_id: 'eval_id' });
   });
 
-  // Mock server tests are disabled
-  test.skip('cancel: only required params', async () => {
+  test('cancel: only required params', async () => {
     const responsePromise = client.evals.runs.cancel('run_id', { eval_id: 'eval_id' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -120,8 +111,7 @@ describe('resource runs', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  // Mock server tests are disabled
-  test.skip('cancel: required and optional params', async () => {
+  test('cancel: required and optional params', async () => {
     const response = await client.evals.runs.cancel('run_id', { eval_id: 'eval_id' });
   });
 });

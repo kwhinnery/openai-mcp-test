@@ -2,21 +2,28 @@
 
 import { APIResource } from '../../core/resource';
 import * as FilesAPI from './files';
+import { VectorStoreFilesPage } from './files';
 import * as VectorStoresAPI from './vector-stores';
 import { APIPromise } from '../../core/api-promise';
+import { CursorPage, type CursorPageParams, PagePromise } from '../../core/pagination';
+import { buildHeaders } from '../../internal/headers';
 import { RequestOptions } from '../../internal/request-options';
 import { path } from '../../internal/utils/path';
 
 export class FileBatches extends APIResource {
   /**
-   * The maximum number of files in a single batch request is 2000.
+   * Create a vector store file batch.
    */
   create(
     vectorStoreID: string,
     body: FileBatchCreateParams,
     options?: RequestOptions,
-  ): APIPromise<VectorStoreFileBatchObject> {
-    return this._client.post(path`/vector_stores/${vectorStoreID}/file_batches`, { body, ...options });
+  ): APIPromise<VectorStoreFileBatch> {
+    return this._client.post(path`/vector_stores/${vectorStoreID}/file_batches`, {
+      body,
+      ...options,
+      headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
+    });
   }
 
   /**
@@ -26,9 +33,12 @@ export class FileBatches extends APIResource {
     batchID: string,
     params: FileBatchRetrieveParams,
     options?: RequestOptions,
-  ): APIPromise<VectorStoreFileBatchObject> {
+  ): APIPromise<VectorStoreFileBatch> {
     const { vector_store_id } = params;
-    return this._client.get(path`/vector_stores/${vector_store_id}/file_batches/${batchID}`, options);
+    return this._client.get(path`/vector_stores/${vector_store_id}/file_batches/${batchID}`, {
+      ...options,
+      headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
+    });
   }
 
   /**
@@ -39,9 +49,12 @@ export class FileBatches extends APIResource {
     batchID: string,
     params: FileBatchCancelParams,
     options?: RequestOptions,
-  ): APIPromise<VectorStoreFileBatchObject> {
+  ): APIPromise<VectorStoreFileBatch> {
     const { vector_store_id } = params;
-    return this._client.post(path`/vector_stores/${vector_store_id}/file_batches/${batchID}/cancel`, options);
+    return this._client.post(path`/vector_stores/${vector_store_id}/file_batches/${batchID}/cancel`, {
+      ...options,
+      headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
+    });
   }
 
   /**
@@ -51,48 +64,20 @@ export class FileBatches extends APIResource {
     batchID: string,
     params: FileBatchListFilesParams,
     options?: RequestOptions,
-  ): APIPromise<ListVectorStoreFilesResponse> {
+  ): PagePromise<VectorStoreFilesPage, FilesAPI.VectorStoreFile> {
     const { vector_store_id, ...query } = params;
-    return this._client.get(path`/vector_stores/${vector_store_id}/file_batches/${batchID}/files`, {
-      query,
-      ...options,
-    });
+    return this._client.getAPIList(
+      path`/vector_stores/${vector_store_id}/file_batches/${batchID}/files`,
+      CursorPage<FilesAPI.VectorStoreFile>,
+      { query, ...options, headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]) },
+    );
   }
 }
 
 /**
- * The chunking strategy used to chunk the file(s). If not set, will use the `auto`
- * strategy.
- */
-export type ChunkingStrategyRequestParam =
-  | VectorStoresAPI.AutoChunkingStrategyRequestParam
-  | VectorStoresAPI.StaticChunkingStrategyRequestParam;
-
-export interface ListVectorStoreFilesResponse {
-  data: Array<FilesAPI.VectorStoreFileObject>;
-
-  first_id: string;
-
-  has_more: boolean;
-
-  last_id: string;
-
-  object: string;
-}
-
-/**
- * Set of 16 key-value pairs that can be attached to an object. This can be useful
- * for storing additional information about the object in a structured format, and
- * querying for objects via API or the dashboard. Keys are strings with a maximum
- * length of 64 characters. Values are strings with a maximum length of 512
- * characters, booleans, or numbers.
- */
-export type VectorStoreFileAttributes = { [key: string]: string | number | boolean };
-
-/**
  * A batch of files attached to a vector store.
  */
-export interface VectorStoreFileBatchObject {
+export interface VectorStoreFileBatch {
   /**
    * The identifier, which can be referenced in API endpoints.
    */
@@ -104,7 +89,7 @@ export interface VectorStoreFileBatchObject {
    */
   created_at: number;
 
-  file_counts: VectorStoreFileBatchObject.FileCounts;
+  file_counts: VectorStoreFileBatch.FileCounts;
 
   /**
    * The object type, which is always `vector_store.file_batch`.
@@ -118,13 +103,15 @@ export interface VectorStoreFileBatchObject {
   status: 'in_progress' | 'completed' | 'cancelled' | 'failed';
 
   /**
-   * The ID of the [vector store](/docs/api-reference/vector-stores/object) that the
-   * [File](/docs/api-reference/files) is attached to.
+   * The ID of the
+   * [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object)
+   * that the [File](https://platform.openai.com/docs/api-reference/files) is
+   * attached to.
    */
   vector_store_id: string;
 }
 
-export namespace VectorStoreFileBatchObject {
+export namespace VectorStoreFileBatch {
   export interface FileCounts {
     /**
      * The number of files that where cancelled.
@@ -161,19 +148,20 @@ export interface FileBatchCreateParams {
    * length of 64 characters. Values are strings with a maximum length of 512
    * characters, booleans, or numbers.
    */
-  attributes?: VectorStoreFileAttributes | null;
+  attributes?: { [key: string]: string | number | boolean } | null;
 
   /**
    * The chunking strategy used to chunk the file(s). If not set, will use the `auto`
-   * strategy.
+   * strategy. Only applicable if `file_ids` is non-empty.
    */
-  chunking_strategy?: ChunkingStrategyRequestParam;
+  chunking_strategy?: VectorStoresAPI.FileChunkingStrategyParam;
 
   /**
-   * A list of [File](/docs/api-reference/files) IDs that the vector store should
-   * use. Useful for tools like `file_search` that can access files. If `attributes`
-   * or `chunking_strategy` are provided, they will be applied to all files in the
-   * batch. The maximum batch size is 2000 files. Mutually exclusive with `files`.
+   * A list of [File](https://platform.openai.com/docs/api-reference/files) IDs that
+   * the vector store should use. Useful for tools like `file_search` that can access
+   * files. If `attributes` or `chunking_strategy` are provided, they will be applied
+   * to all files in the batch. The maximum batch size is 2000 files. Mutually
+   * exclusive with `files`.
    */
   file_ids?: Array<string>;
 
@@ -184,7 +172,33 @@ export interface FileBatchCreateParams {
    * be specified for each file. The maximum batch size is 2000 files. Mutually
    * exclusive with `file_ids`.
    */
-  files?: Array<FilesAPI.CreateVectorStoreFileRequest>;
+  files?: Array<FileBatchCreateParams.File>;
+}
+
+export namespace FileBatchCreateParams {
+  export interface File {
+    /**
+     * A [File](https://platform.openai.com/docs/api-reference/files) ID that the
+     * vector store should use. Useful for tools like `file_search` that can access
+     * files.
+     */
+    file_id: string;
+
+    /**
+     * Set of 16 key-value pairs that can be attached to an object. This can be useful
+     * for storing additional information about the object in a structured format, and
+     * querying for objects via API or the dashboard. Keys are strings with a maximum
+     * length of 64 characters. Values are strings with a maximum length of 512
+     * characters, booleans, or numbers.
+     */
+    attributes?: { [key: string]: string | number | boolean } | null;
+
+    /**
+     * The chunking strategy used to chunk the file(s). If not set, will use the `auto`
+     * strategy. Only applicable if `file_ids` is non-empty.
+     */
+    chunking_strategy?: VectorStoresAPI.FileChunkingStrategyParam;
+  }
 }
 
 export interface FileBatchRetrieveParams {
@@ -201,19 +215,11 @@ export interface FileBatchCancelParams {
   vector_store_id: string;
 }
 
-export interface FileBatchListFilesParams {
+export interface FileBatchListFilesParams extends CursorPageParams {
   /**
    * Path param: The ID of the vector store that the files belong to.
    */
   vector_store_id: string;
-
-  /**
-   * Query param: A cursor for use in pagination. `after` is an object ID that
-   * defines your place in the list. For instance, if you make a list request and
-   * receive 100 objects, ending with obj_foo, your subsequent call can include
-   * after=obj_foo in order to fetch the next page of the list.
-   */
-  after?: string;
 
   /**
    * Query param: A cursor for use in pagination. `before` is an object ID that
@@ -230,12 +236,6 @@ export interface FileBatchListFilesParams {
   filter?: 'in_progress' | 'completed' | 'failed' | 'cancelled';
 
   /**
-   * Query param: A limit on the number of objects to be returned. Limit can range
-   * between 1 and 100, and the default is 20.
-   */
-  limit?: number;
-
-  /**
    * Query param: Sort order by the `created_at` timestamp of the objects. `asc` for
    * ascending order and `desc` for descending order.
    */
@@ -244,13 +244,12 @@ export interface FileBatchListFilesParams {
 
 export declare namespace FileBatches {
   export {
-    type ChunkingStrategyRequestParam as ChunkingStrategyRequestParam,
-    type ListVectorStoreFilesResponse as ListVectorStoreFilesResponse,
-    type VectorStoreFileAttributes as VectorStoreFileAttributes,
-    type VectorStoreFileBatchObject as VectorStoreFileBatchObject,
+    type VectorStoreFileBatch as VectorStoreFileBatch,
     type FileBatchCreateParams as FileBatchCreateParams,
     type FileBatchRetrieveParams as FileBatchRetrieveParams,
     type FileBatchCancelParams as FileBatchCancelParams,
     type FileBatchListFilesParams as FileBatchListFilesParams,
   };
 }
+
+export { type VectorStoreFilesPage };

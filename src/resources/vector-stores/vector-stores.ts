@@ -1,53 +1,60 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../../core/resource';
-import * as CompletionsAPI from '../chat/completions';
+import * as Shared from '../shared';
 import * as FileBatchesAPI from './file-batches';
 import {
-  ChunkingStrategyRequestParam,
   FileBatchCancelParams,
   FileBatchCreateParams,
   FileBatchListFilesParams,
   FileBatchRetrieveParams,
   FileBatches,
-  ListVectorStoreFilesResponse,
-  VectorStoreFileAttributes,
-  VectorStoreFileBatchObject,
+  VectorStoreFileBatch,
 } from './file-batches';
 import * as FilesAPI from './files';
 import {
-  CreateVectorStoreFileRequest,
+  FileContentParams,
+  FileContentResponse,
+  FileContentResponsesPage,
   FileCreateParams,
   FileDeleteParams,
-  FileDeleteResponse,
   FileListParams,
-  FileRetrieveContentParams,
-  FileRetrieveContentResponse,
   FileRetrieveParams,
   FileUpdateParams,
   Files,
-  VectorStoreFileObject,
+  VectorStoreFile,
+  VectorStoreFileDeleted,
+  VectorStoreFilesPage,
 } from './files';
 import { APIPromise } from '../../core/api-promise';
+import { CursorPage, type CursorPageParams, Page, PagePromise } from '../../core/pagination';
+import { buildHeaders } from '../../internal/headers';
 import { RequestOptions } from '../../internal/request-options';
 import { path } from '../../internal/utils/path';
 
 export class VectorStores extends APIResource {
-  fileBatches: FileBatchesAPI.FileBatches = new FileBatchesAPI.FileBatches(this._client);
   files: FilesAPI.Files = new FilesAPI.Files(this._client);
+  fileBatches: FileBatchesAPI.FileBatches = new FileBatchesAPI.FileBatches(this._client);
 
   /**
    * Create a vector store.
    */
-  create(body: VectorStoreCreateParams, options?: RequestOptions): APIPromise<VectorStoreObject> {
-    return this._client.post('/vector_stores', { body, ...options });
+  create(body: VectorStoreCreateParams, options?: RequestOptions): APIPromise<VectorStore> {
+    return this._client.post('/vector_stores', {
+      body,
+      ...options,
+      headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
+    });
   }
 
   /**
    * Retrieves a vector store.
    */
-  retrieve(vectorStoreID: string, options?: RequestOptions): APIPromise<VectorStoreObject> {
-    return this._client.get(path`/vector_stores/${vectorStoreID}`, options);
+  retrieve(vectorStoreID: string, options?: RequestOptions): APIPromise<VectorStore> {
+    return this._client.get(path`/vector_stores/${vectorStoreID}`, {
+      ...options,
+      headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
+    });
   }
 
   /**
@@ -57,8 +64,12 @@ export class VectorStores extends APIResource {
     vectorStoreID: string,
     body: VectorStoreUpdateParams,
     options?: RequestOptions,
-  ): APIPromise<VectorStoreObject> {
-    return this._client.post(path`/vector_stores/${vectorStoreID}`, { body, ...options });
+  ): APIPromise<VectorStore> {
+    return this._client.post(path`/vector_stores/${vectorStoreID}`, {
+      body,
+      ...options,
+      headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
+    });
   }
 
   /**
@@ -67,15 +78,22 @@ export class VectorStores extends APIResource {
   list(
     query: VectorStoreListParams | null | undefined = {},
     options?: RequestOptions,
-  ): APIPromise<VectorStoreListResponse> {
-    return this._client.get('/vector_stores', { query, ...options });
+  ): PagePromise<VectorStoresPage, VectorStore> {
+    return this._client.getAPIList('/vector_stores', CursorPage<VectorStore>, {
+      query,
+      ...options,
+      headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
+    });
   }
 
   /**
    * Delete a vector store.
    */
-  delete(vectorStoreID: string, options?: RequestOptions): APIPromise<VectorStoreDeleteResponse> {
-    return this._client.delete(path`/vector_stores/${vectorStoreID}`, options);
+  delete(vectorStoreID: string, options?: RequestOptions): APIPromise<VectorStoreDeleted> {
+    return this._client.delete(path`/vector_stores/${vectorStoreID}`, {
+      ...options,
+      headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
+    });
   }
 
   /**
@@ -86,16 +104,30 @@ export class VectorStores extends APIResource {
     vectorStoreID: string,
     body: VectorStoreSearchParams,
     options?: RequestOptions,
-  ): APIPromise<VectorStoreSearchResponse> {
-    return this._client.post(path`/vector_stores/${vectorStoreID}/search`, { body, ...options });
+  ): PagePromise<VectorStoreSearchResponsesPage, VectorStoreSearchResponse> {
+    return this._client.getAPIList(
+      path`/vector_stores/${vectorStoreID}/search`,
+      Page<VectorStoreSearchResponse>,
+      {
+        body,
+        method: 'post',
+        ...options,
+        headers: buildHeaders([{ 'OpenAI-Beta': 'assistants=v2' }, options?.headers]),
+      },
+    );
   }
 }
+
+export type VectorStoresPage = CursorPage<VectorStore>;
+
+// Note: no pagination actually occurs yet, this is for forwards-compatibility.
+export type VectorStoreSearchResponsesPage = Page<VectorStoreSearchResponse>;
 
 /**
  * The default strategy. This strategy currently uses a `max_chunk_size_tokens` of
  * `800` and `chunk_overlap_tokens` of `400`.
  */
-export interface AutoChunkingStrategyRequestParam {
+export interface AutoFileChunkingStrategyParam {
   /**
    * Always `auto`.
    */
@@ -103,54 +135,29 @@ export interface AutoChunkingStrategyRequestParam {
 }
 
 /**
- * A filter used to compare a specified attribute key to a given value using a
- * defined comparison operation.
+ * The strategy used to chunk the file.
  */
-export interface ComparisonFilter {
-  /**
-   * The key to compare against the value.
-   */
-  key: string;
-
-  /**
-   * Specifies the comparison operator: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`,
-   * `nin`.
-   *
-   * - `eq`: equals
-   * - `ne`: not equal
-   * - `gt`: greater than
-   * - `gte`: greater than or equal
-   * - `lt`: less than
-   * - `lte`: less than or equal
-   * - `in`: in
-   * - `nin`: not in
-   */
-  type: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte';
-
-  /**
-   * The value to compare against the attribute key; supports string, number, or
-   * boolean types.
-   */
-  value: string | number | boolean | Array<string | number>;
-}
+export type FileChunkingStrategy = StaticFileChunkingStrategyObject | OtherFileChunkingStrategyObject;
 
 /**
- * Combine multiple filters using `and` or `or`.
+ * The chunking strategy used to chunk the file(s). If not set, will use the `auto`
+ * strategy. Only applicable if `file_ids` is non-empty.
  */
-export interface CompoundFilter {
-  /**
-   * Array of filters to combine. Items can be `ComparisonFilter` or
-   * `CompoundFilter`.
-   */
-  filters: Array<ComparisonFilter | unknown>;
+export type FileChunkingStrategyParam = AutoFileChunkingStrategyParam | StaticFileChunkingStrategyObjectParam;
 
+/**
+ * This is returned when the chunking strategy is unknown. Typically, this is
+ * because the file was indexed before the `chunking_strategy` concept was
+ * introduced in the API.
+ */
+export interface OtherFileChunkingStrategyObject {
   /**
-   * Type of operation: `and` or `or`.
+   * Always `other`.
    */
-  type: 'and' | 'or';
+  type: 'other';
 }
 
-export interface StaticChunkingStrategy {
+export interface StaticFileChunkingStrategy {
   /**
    * The number of tokens that overlap between chunks. The default value is `400`.
    *
@@ -165,11 +172,8 @@ export interface StaticChunkingStrategy {
   max_chunk_size_tokens: number;
 }
 
-/**
- * Customize your own chunking strategy by setting chunk size and chunk overlap.
- */
-export interface StaticChunkingStrategyRequestParam {
-  static: StaticChunkingStrategy;
+export interface StaticFileChunkingStrategyObject {
+  static: StaticFileChunkingStrategy;
 
   /**
    * Always `static`.
@@ -178,26 +182,22 @@ export interface StaticChunkingStrategyRequestParam {
 }
 
 /**
- * The expiration policy for a vector store.
+ * Customize your own chunking strategy by setting chunk size and chunk overlap.
  */
-export interface VectorStoreExpirationAfter {
-  /**
-   * Anchor timestamp after which the expiration policy applies. Supported anchors:
-   * `last_active_at`.
-   */
-  anchor: 'last_active_at';
+export interface StaticFileChunkingStrategyObjectParam {
+  static: StaticFileChunkingStrategy;
 
   /**
-   * The number of days after the anchor time that the vector store will expire.
+   * Always `static`.
    */
-  days: number;
+  type: 'static';
 }
 
 /**
  * A vector store is a collection of processed files can be used by the
  * `file_search` tool.
  */
-export interface VectorStoreObject {
+export interface VectorStore {
   /**
    * The identifier, which can be referenced in API endpoints.
    */
@@ -208,7 +208,7 @@ export interface VectorStoreObject {
    */
   created_at: number;
 
-  file_counts: VectorStoreObject.FileCounts;
+  file_counts: VectorStore.FileCounts;
 
   /**
    * The Unix timestamp (in seconds) for when the vector store was last active.
@@ -223,7 +223,7 @@ export interface VectorStoreObject {
    * Keys are strings with a maximum length of 64 characters. Values are strings with
    * a maximum length of 512 characters.
    */
-  metadata: CompletionsAPI.Metadata | null;
+  metadata: Shared.Metadata | null;
 
   /**
    * The name of the vector store.
@@ -250,7 +250,7 @@ export interface VectorStoreObject {
   /**
    * The expiration policy for a vector store.
    */
-  expires_after?: VectorStoreExpirationAfter;
+  expires_after?: VectorStore.ExpiresAfter;
 
   /**
    * The Unix timestamp (in seconds) for when the vector store will expire.
@@ -258,7 +258,7 @@ export interface VectorStoreObject {
   expires_at?: number | null;
 }
 
-export namespace VectorStoreObject {
+export namespace VectorStore {
   export interface FileCounts {
     /**
      * The number of files that were cancelled.
@@ -285,21 +285,25 @@ export namespace VectorStoreObject {
      */
     total: number;
   }
+
+  /**
+   * The expiration policy for a vector store.
+   */
+  export interface ExpiresAfter {
+    /**
+     * Anchor timestamp after which the expiration policy applies. Supported anchors:
+     * `last_active_at`.
+     */
+    anchor: 'last_active_at';
+
+    /**
+     * The number of days after the anchor time that the vector store will expire.
+     */
+    days: number;
+  }
 }
 
-export interface VectorStoreListResponse {
-  data: Array<VectorStoreObject>;
-
-  first_id: string;
-
-  has_more: boolean;
-
-  last_id: string;
-
-  object: string;
-}
-
-export interface VectorStoreDeleteResponse {
+export interface VectorStoreDeleted {
   id: string;
 
   deleted: boolean;
@@ -309,72 +313,46 @@ export interface VectorStoreDeleteResponse {
 
 export interface VectorStoreSearchResponse {
   /**
-   * The list of search result items.
+   * Set of 16 key-value pairs that can be attached to an object. This can be useful
+   * for storing additional information about the object in a structured format, and
+   * querying for objects via API or the dashboard. Keys are strings with a maximum
+   * length of 64 characters. Values are strings with a maximum length of 512
+   * characters, booleans, or numbers.
    */
-  data: Array<VectorStoreSearchResponse.Data>;
+  attributes: { [key: string]: string | number | boolean } | null;
 
   /**
-   * Indicates if there are more results to fetch.
+   * Content chunks from the file.
    */
-  has_more: boolean;
+  content: Array<VectorStoreSearchResponse.Content>;
 
   /**
-   * The token for the next page, if any.
+   * The ID of the vector store file.
    */
-  next_page: string | null;
+  file_id: string;
 
   /**
-   * The object type, which is always `vector_store.search_results.page`
+   * The name of the vector store file.
    */
-  object: 'vector_store.search_results.page';
+  filename: string;
 
-  search_query: Array<string>;
+  /**
+   * The similarity score for the result.
+   */
+  score: number;
 }
 
 export namespace VectorStoreSearchResponse {
-  export interface Data {
+  export interface Content {
     /**
-     * Set of 16 key-value pairs that can be attached to an object. This can be useful
-     * for storing additional information about the object in a structured format, and
-     * querying for objects via API or the dashboard. Keys are strings with a maximum
-     * length of 64 characters. Values are strings with a maximum length of 512
-     * characters, booleans, or numbers.
+     * The text content returned from search.
      */
-    attributes: FileBatchesAPI.VectorStoreFileAttributes | null;
+    text: string;
 
     /**
-     * Content chunks from the file.
+     * The type of content.
      */
-    content: Array<Data.Content>;
-
-    /**
-     * The ID of the vector store file.
-     */
-    file_id: string;
-
-    /**
-     * The name of the vector store file.
-     */
-    filename: string;
-
-    /**
-     * The similarity score for the result.
-     */
-    score: number;
-  }
-
-  export namespace Data {
-    export interface Content {
-      /**
-       * The text content returned from search.
-       */
-      text: string;
-
-      /**
-       * The type of content.
-       */
-      type: 'text';
-    }
+    type: 'text';
   }
 }
 
@@ -383,7 +361,7 @@ export interface VectorStoreCreateParams {
    * The chunking strategy used to chunk the file(s). If not set, will use the `auto`
    * strategy. Only applicable if `file_ids` is non-empty.
    */
-  chunking_strategy?: AutoChunkingStrategyRequestParam | StaticChunkingStrategyRequestParam;
+  chunking_strategy?: FileChunkingStrategyParam;
 
   /**
    * A description for the vector store. Can be used to describe the vector store's
@@ -394,11 +372,12 @@ export interface VectorStoreCreateParams {
   /**
    * The expiration policy for a vector store.
    */
-  expires_after?: VectorStoreExpirationAfter;
+  expires_after?: VectorStoreCreateParams.ExpiresAfter;
 
   /**
-   * A list of [File](/docs/api-reference/files) IDs that the vector store should
-   * use. Useful for tools like `file_search` that can access files.
+   * A list of [File](https://platform.openai.com/docs/api-reference/files) IDs that
+   * the vector store should use. Useful for tools like `file_search` that can access
+   * files.
    */
   file_ids?: Array<string>;
 
@@ -410,7 +389,7 @@ export interface VectorStoreCreateParams {
    * Keys are strings with a maximum length of 64 characters. Values are strings with
    * a maximum length of 512 characters.
    */
-  metadata?: CompletionsAPI.Metadata | null;
+  metadata?: Shared.Metadata | null;
 
   /**
    * The name of the vector store.
@@ -418,11 +397,29 @@ export interface VectorStoreCreateParams {
   name?: string;
 }
 
+export namespace VectorStoreCreateParams {
+  /**
+   * The expiration policy for a vector store.
+   */
+  export interface ExpiresAfter {
+    /**
+     * Anchor timestamp after which the expiration policy applies. Supported anchors:
+     * `last_active_at`.
+     */
+    anchor: 'last_active_at';
+
+    /**
+     * The number of days after the anchor time that the vector store will expire.
+     */
+    days: number;
+  }
+}
+
 export interface VectorStoreUpdateParams {
   /**
    * The expiration policy for a vector store.
    */
-  expires_after?: VectorStoreExpirationAfter | null;
+  expires_after?: VectorStoreUpdateParams.ExpiresAfter | null;
 
   /**
    * Set of 16 key-value pairs that can be attached to an object. This can be useful
@@ -432,7 +429,7 @@ export interface VectorStoreUpdateParams {
    * Keys are strings with a maximum length of 64 characters. Values are strings with
    * a maximum length of 512 characters.
    */
-  metadata?: CompletionsAPI.Metadata | null;
+  metadata?: Shared.Metadata | null;
 
   /**
    * The name of the vector store.
@@ -440,15 +437,25 @@ export interface VectorStoreUpdateParams {
   name?: string | null;
 }
 
-export interface VectorStoreListParams {
+export namespace VectorStoreUpdateParams {
   /**
-   * A cursor for use in pagination. `after` is an object ID that defines your place
-   * in the list. For instance, if you make a list request and receive 100 objects,
-   * ending with obj_foo, your subsequent call can include after=obj_foo in order to
-   * fetch the next page of the list.
+   * The expiration policy for a vector store.
    */
-  after?: string;
+  export interface ExpiresAfter {
+    /**
+     * Anchor timestamp after which the expiration policy applies. Supported anchors:
+     * `last_active_at`.
+     */
+    anchor: 'last_active_at';
 
+    /**
+     * The number of days after the anchor time that the vector store will expire.
+     */
+    days: number;
+  }
+}
+
+export interface VectorStoreListParams extends CursorPageParams {
   /**
    * A cursor for use in pagination. `before` is an object ID that defines your place
    * in the list. For instance, if you make a list request and receive 100 objects,
@@ -456,12 +463,6 @@ export interface VectorStoreListParams {
    * to fetch the previous page of the list.
    */
   before?: string;
-
-  /**
-   * A limit on the number of objects to be returned. Limit can range between 1 and
-   * 100, and the default is 20.
-   */
-  limit?: number;
 
   /**
    * Sort order by the `created_at` timestamp of the objects. `asc` for ascending
@@ -479,7 +480,7 @@ export interface VectorStoreSearchParams {
   /**
    * A filter to apply based on file attributes.
    */
-  filters?: ComparisonFilter | CompoundFilter;
+  filters?: Shared.ComparisonFilter | Shared.CompoundFilter;
 
   /**
    * The maximum number of results to return. This number should be between 1 and 50
@@ -512,21 +513,23 @@ export namespace VectorStoreSearchParams {
   }
 }
 
-VectorStores.FileBatches = FileBatches;
 VectorStores.Files = Files;
+VectorStores.FileBatches = FileBatches;
 
 export declare namespace VectorStores {
   export {
-    type AutoChunkingStrategyRequestParam as AutoChunkingStrategyRequestParam,
-    type ComparisonFilter as ComparisonFilter,
-    type CompoundFilter as CompoundFilter,
-    type StaticChunkingStrategy as StaticChunkingStrategy,
-    type StaticChunkingStrategyRequestParam as StaticChunkingStrategyRequestParam,
-    type VectorStoreExpirationAfter as VectorStoreExpirationAfter,
-    type VectorStoreObject as VectorStoreObject,
-    type VectorStoreListResponse as VectorStoreListResponse,
-    type VectorStoreDeleteResponse as VectorStoreDeleteResponse,
+    type AutoFileChunkingStrategyParam as AutoFileChunkingStrategyParam,
+    type FileChunkingStrategy as FileChunkingStrategy,
+    type FileChunkingStrategyParam as FileChunkingStrategyParam,
+    type OtherFileChunkingStrategyObject as OtherFileChunkingStrategyObject,
+    type StaticFileChunkingStrategy as StaticFileChunkingStrategy,
+    type StaticFileChunkingStrategyObject as StaticFileChunkingStrategyObject,
+    type StaticFileChunkingStrategyObjectParam as StaticFileChunkingStrategyObjectParam,
+    type VectorStore as VectorStore,
+    type VectorStoreDeleted as VectorStoreDeleted,
     type VectorStoreSearchResponse as VectorStoreSearchResponse,
+    type VectorStoresPage as VectorStoresPage,
+    type VectorStoreSearchResponsesPage as VectorStoreSearchResponsesPage,
     type VectorStoreCreateParams as VectorStoreCreateParams,
     type VectorStoreUpdateParams as VectorStoreUpdateParams,
     type VectorStoreListParams as VectorStoreListParams,
@@ -534,28 +537,26 @@ export declare namespace VectorStores {
   };
 
   export {
-    FileBatches as FileBatches,
-    type ChunkingStrategyRequestParam as ChunkingStrategyRequestParam,
-    type ListVectorStoreFilesResponse as ListVectorStoreFilesResponse,
-    type VectorStoreFileAttributes as VectorStoreFileAttributes,
-    type VectorStoreFileBatchObject as VectorStoreFileBatchObject,
-    type FileBatchCreateParams as FileBatchCreateParams,
-    type FileBatchRetrieveParams as FileBatchRetrieveParams,
-    type FileBatchCancelParams as FileBatchCancelParams,
-    type FileBatchListFilesParams as FileBatchListFilesParams,
-  };
-
-  export {
     Files as Files,
-    type CreateVectorStoreFileRequest as CreateVectorStoreFileRequest,
-    type VectorStoreFileObject as VectorStoreFileObject,
-    type FileDeleteResponse as FileDeleteResponse,
-    type FileRetrieveContentResponse as FileRetrieveContentResponse,
+    type VectorStoreFile as VectorStoreFile,
+    type VectorStoreFileDeleted as VectorStoreFileDeleted,
+    type FileContentResponse as FileContentResponse,
+    type VectorStoreFilesPage as VectorStoreFilesPage,
+    type FileContentResponsesPage as FileContentResponsesPage,
     type FileCreateParams as FileCreateParams,
     type FileRetrieveParams as FileRetrieveParams,
     type FileUpdateParams as FileUpdateParams,
     type FileListParams as FileListParams,
     type FileDeleteParams as FileDeleteParams,
-    type FileRetrieveContentParams as FileRetrieveContentParams,
+    type FileContentParams as FileContentParams,
+  };
+
+  export {
+    FileBatches as FileBatches,
+    type VectorStoreFileBatch as VectorStoreFileBatch,
+    type FileBatchCreateParams as FileBatchCreateParams,
+    type FileBatchRetrieveParams as FileBatchRetrieveParams,
+    type FileBatchCancelParams as FileBatchCancelParams,
+    type FileBatchListFilesParams as FileBatchListFilesParams,
   };
 }
