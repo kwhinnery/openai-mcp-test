@@ -9,9 +9,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stainless-sdks/openai-mcp-test-typescript.git"
+    "url": "git+https://github.com/kwhinnery/openai-mcp-test.git"
   },
-  "homepage": "https://github.com/stainless-sdks/openai-mcp-test-typescript/tree/main/packages/mcp-server#readme",
+  "homepage": "https://github.com/kwhinnery/openai-mcp-test/tree/main/packages/mcp-server#readme",
   "documentation": "https://platform.openai.com/docs",
   "server": {
     "type": "node",
