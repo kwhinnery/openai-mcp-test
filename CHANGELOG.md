@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.1 (2026-02-23)
+
+Full Changelog: [v0.1.0...v0.1.1](https://github.com/kwhinnery/openai-mcp-test/compare/v0.1.0...v0.1.1)
+
+### Chores
+
+* update SDK settings ([30d8790](https://github.com/kwhinnery/openai-mcp-test/commit/30d87904858a441b6d78603218f3119f153c3a49))
+* update SDK settings ([ec6dc2a](https://github.com/kwhinnery/openai-mcp-test/commit/ec6dc2aed400e0330ae903f6e1a1386d7d78746c))
+
 ## 0.1.0 (2026-02-23)
 
 Full Changelog: [v0.0.1...v0.1.0](https://github.com/kwhinnery/openai-mcp-test/compare/v0.0.1...v0.1.0)

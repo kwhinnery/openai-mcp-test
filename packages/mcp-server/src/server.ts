@@ -20,7 +20,7 @@ export const newMcpServer = async (stainlessApiKey: string | undefined) =>
   new McpServer(
     {
       name: 'openai_mcp_test_api',
-      version: '0.1.0',
+      version: '0.1.1',
     },
     {
       instructions: await getInstructions(stainlessApiKey),
