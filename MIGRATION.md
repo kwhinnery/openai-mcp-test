@@ -157,10 +157,10 @@ client.example.list(undefined, { headers: { ... } });
 
 ### Removed `httpAgent` in favor of `fetchOptions`
 
-The `httpAgent` client option has been removed in favor of a [platform-specific `fetchOptions` property](https://github.com/openai-mcp-test/openai-node#fetch-options).
+The `httpAgent` client option has been removed in favor of a [platform-specific `fetchOptions` property](https://github.com/stainless-sdks/openai-mcp-test-typescript#fetch-options).
 This change was made as `httpAgent` relied on `node:http` agents which are not supported by any runtime's builtin fetch implementation.
 
-If you were using `httpAgent` for proxy support, check out the [new proxy documentation](https://github.com/openai-mcp-test/openai-node#configuring-proxies).
+If you were using `httpAgent` for proxy support, check out the [new proxy documentation](https://github.com/stainless-sdks/openai-mcp-test-typescript#configuring-proxies).
 
 Before:
 

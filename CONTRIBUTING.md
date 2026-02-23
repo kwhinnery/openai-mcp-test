@@ -42,15 +42,15 @@ If you’d like to use the repository from source, you can either install from g
 To install via git:
 
 ```sh
-$ npm install git+ssh://git@github.com:openai-mcp-test/openai-node.git
+$ npm install git+ssh://git@github.com:stainless-sdks/openai-mcp-test-typescript.git
 ```
 
 Alternatively, to link a local copy of the repo:
 
 ```sh
 # Clone
-$ git clone https://www.github.com/openai-mcp-test/openai-node
-$ cd openai-node
+$ git clone https://www.github.com/stainless-sdks/openai-mcp-test-typescript
+$ cd openai-mcp-test-typescript
 
 # With yarn
 $ yarn link

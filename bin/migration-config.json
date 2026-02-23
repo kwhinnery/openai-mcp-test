@@ -1,6 +1,6 @@
 {
   "pkg": "openai-mcp-test",
-  "githubRepo": "https://github.com/openai-mcp-test/openai-node",
+  "githubRepo": "https://github.com/stainless-sdks/openai-mcp-test-typescript",
   "clientClass": "OpenAI",
   "methods": [
     {
