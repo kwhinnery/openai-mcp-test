@@ -60,7 +60,7 @@ $ yarn link openai-mcp-test
 # With pnpm
 $ pnpm link --global
 $ cd ../my-package
-$ pnpm link -—global openai-mcp-test
+$ pnpm link --global openai-mcp-test
 ```
 
 ## Running tests
