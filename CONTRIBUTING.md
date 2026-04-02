@@ -60,12 +60,12 @@ $ yarn link openai-mcp-test
 # With pnpm
 $ pnpm link --global
 $ cd ../my-package
-$ pnpm link -—global openai-mcp-test
+$ pnpm link --global openai-mcp-test
 ```
 
 ## Running tests
 
-Most tests require you to [set up a mock server](https://github.com/stoplightio/prism) against the OpenAPI spec to run the tests.
+Most tests require you to [set up a mock server](https://github.com/dgellow/steady) against the OpenAPI spec to run the tests.
 
 ```sh
 $ ./scripts/mock
