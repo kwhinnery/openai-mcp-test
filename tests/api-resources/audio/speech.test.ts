@@ -12,7 +12,7 @@ describe('resource speech', () => {
   test.skip('create: required and optional params', async () => {
     const response = await client.audio.speech.create({
       input: 'input',
-      model: 'string',
+      model: 'tts-1',
       voice: 'ash',
       instructions: 'instructions',
       response_format: 'mp3',
