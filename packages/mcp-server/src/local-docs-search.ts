@@ -373,7 +373,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.files.create',
         example:
-          "import OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst fileObject = await client.files.create({\n  file: fs.createReadStream('fine-tune.jsonl'),\n  purpose: 'assistants',\n});\n\nconsole.log(fileObject.id);",
+          "import fs from 'fs';\nimport OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst fileObject = await client.files.create({\n  file: fs.createReadStream('fine-tune.jsonl'),\n  purpose: 'assistants',\n});\n\nconsole.log(fileObject.id);",
       },
     },
   },
@@ -529,7 +529,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.images.edit',
         example:
-          "import OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst imagesResponse = await client.images.edit({\n  image: fs.createReadStream('path/to/file'),\n  prompt: 'A cute baby sea otter wearing a beret',\n});\n\nconsole.log(imagesResponse);",
+          "import fs from 'fs';\nimport OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst imagesResponse = await client.images.edit({\n  image: fs.createReadStream('path/to/file'),\n  prompt: 'A cute baby sea otter wearing a beret',\n});\n\nconsole.log(imagesResponse);",
       },
     },
   },
@@ -561,7 +561,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.images.createVariation',
         example:
-          "import OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst imagesResponse = await client.images.createVariation({\n  image: fs.createReadStream('otter.png'),\n});\n\nconsole.log(imagesResponse.created);",
+          "import fs from 'fs';\nimport OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst imagesResponse = await client.images.createVariation({\n  image: fs.createReadStream('otter.png'),\n});\n\nconsole.log(imagesResponse.created);",
       },
     },
   },
@@ -600,7 +600,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.audio.transcriptions.create',
         example:
-          "import OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst transcription = await client.audio.transcriptions.create({\n  file: fs.createReadStream('speech.mp3'),\n  model: 'gpt-4o-transcribe',\n});\n\nconsole.log(transcription);",
+          "import fs from 'fs';\nimport OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst transcription = await client.audio.transcriptions.create({\n  file: fs.createReadStream('speech.mp3'),\n  model: 'gpt-4o-transcribe',\n});\n\nconsole.log(transcription);",
       },
     },
   },
@@ -631,7 +631,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.audio.translations.create',
         example:
-          "import OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst translation = await client.audio.translations.create({\n  file: fs.createReadStream('speech.mp3'),\n  model: 'whisper-1',\n});\n\nconsole.log(translation);",
+          "import fs from 'fs';\nimport OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst translation = await client.audio.translations.create({\n  file: fs.createReadStream('speech.mp3'),\n  model: 'whisper-1',\n});\n\nconsole.log(translation);",
       },
     },
   },
@@ -2640,7 +2640,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.uploads.parts.create',
         example:
-          "import OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst uploadPart = await client.uploads.parts.create('upload_abc123', {\n  data: fs.createReadStream('path/to/file'),\n});\n\nconsole.log(uploadPart.id);",
+          "import fs from 'fs';\nimport OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst uploadPart = await client.uploads.parts.create('upload_abc123', {\n  data: fs.createReadStream('path/to/file'),\n});\n\nconsole.log(uploadPart.id);",
       },
     },
   },
@@ -3701,7 +3701,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.containers.files.create',
         example:
-          "import OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst file = await client.containers.files.create('container_id');\n\nconsole.log(file.id);",
+          "import fs from 'fs';\nimport OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst file = await client.containers.files.create('container_id');\n\nconsole.log(file.id);",
       },
     },
   },
@@ -4074,7 +4074,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       typescript: {
         method: 'client.videos.create',
         example:
-          "import OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst video = await client.videos.create({ prompt: 'x' });\n\nconsole.log(video.id);",
+          "import fs from 'fs';\nimport OpenAI from 'openai-mcp-test';\n\nconst client = new OpenAI({\n  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted\n});\n\nconst video = await client.videos.create({ prompt: 'x' });\n\nconsole.log(video.id);",
       },
     },
   },
