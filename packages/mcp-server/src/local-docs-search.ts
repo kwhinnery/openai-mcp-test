@@ -153,7 +153,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          'curl https://api.openai.com/v1/chat/completions \\\n    -H \'Content-Type: application/json\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "messages": [\n            {\n              "content": "string",\n              "role": "developer"\n            }\n          ],\n          "model": "gpt-4o",\n          "n": 1,\n          "prompt_cache_key": "prompt-cache-key-1234",\n          "safety_identifier": "safety-identifier-1234",\n          "temperature": 1,\n          "top_p": 1,\n          "user": "user-1234"\n        }\'',
+          'curl https://api.openai.com/v1/chat/completions \\\n    -H \'Content-Type: application/json\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "messages": [\n            {\n              "content": "string",\n              "role": "developer"\n            }\n          ],\n          "model": "gpt-4o",\n          "n": 1,\n          "prompt_cache_key": "prompt-cache-key-1234",\n          "safety_identifier": "safety-identifier-1234",\n          "user": "user-1234"\n        }\'',
       },
     },
   },
@@ -487,7 +487,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          'curl https://api.openai.com/v1/images/generations \\\n    -H \'Content-Type: application/json\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "prompt": "A cute baby sea otter",\n          "background": "transparent",\n          "moderation": "low",\n          "n": 1,\n          "output_compression": 100,\n          "output_format": "png",\n          "partial_images": 1,\n          "quality": "medium",\n          "response_format": "url",\n          "size": "1024x1024",\n          "style": "vivid",\n          "user": "user-1234"\n        }\'',
+          'curl https://api.openai.com/v1/images/generations \\\n    -H \'Content-Type: application/json\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "prompt": "A cute baby sea otter",\n          "background": "transparent",\n          "moderation": "low",\n          "n": 1,\n          "output_compression": 100,\n          "output_format": "png",\n          "quality": "medium",\n          "response_format": "url",\n          "size": "1024x1024",\n          "stream": false,\n          "style": "vivid",\n          "user": "user-1234"\n        }\'',
       },
     },
   },
@@ -529,7 +529,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          "curl https://api.openai.com/v1/images/edits \\\n    -H 'Content-Type: multipart/form-data' \\\n    -H \"Authorization: Bearer $OPENAI_API_KEY\" \\\n    -F image='Example data' \\\n    -F prompt='A cute baby sea otter wearing a beret' \\\n    -F background=transparent \\\n    -F n=1 \\\n    -F output_compression=100 \\\n    -F output_format=png \\\n    -F partial_images=1 \\\n    -F quality=high \\\n    -F response_format=url \\\n    -F size=1024x1024 \\\n    -F user=user-1234",
+          "curl https://api.openai.com/v1/images/edits \\\n    -H 'Content-Type: multipart/form-data' \\\n    -H \"Authorization: Bearer $OPENAI_API_KEY\" \\\n    -F image='Example data' \\\n    -F prompt='A cute baby sea otter wearing a beret' \\\n    -F background=transparent \\\n    -F n=1 \\\n    -F output_compression=100 \\\n    -F output_format=png \\\n    -F quality=high \\\n    -F response_format=url \\\n    -F size=1024x1024 \\\n    -F stream=false \\\n    -F user=user-1234",
       },
     },
   },
@@ -1807,7 +1807,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          'curl https://api.openai.com/v1/assistants \\\n    -H \'Content-Type: application/json\' \\\n    -H \'OpenAI-Beta: assistants=v2\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "model": "gpt-4o",\n          "temperature": 1,\n          "top_p": 1\n        }\'',
+          'curl https://api.openai.com/v1/assistants \\\n    -H \'Content-Type: application/json\' \\\n    -H \'OpenAI-Beta: assistants=v2\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "model": "gpt-4o"\n        }\'',
       },
     },
   },
@@ -1870,7 +1870,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          'curl https://api.openai.com/v1/assistants/$ASSISTANT_ID \\\n    -H \'Content-Type: application/json\' \\\n    -H \'OpenAI-Beta: assistants=v2\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "temperature": 1,\n          "top_p": 1\n        }\'',
+          "curl https://api.openai.com/v1/assistants/$ASSISTANT_ID \\\n    -H 'Content-Type: application/json' \\\n    -H 'OpenAI-Beta: assistants=v2' \\\n    -H \"Authorization: Bearer $OPENAI_API_KEY\" \\\n    -d '{}'",
       },
     },
   },
@@ -2696,7 +2696,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          'curl https://api.openai.com/v1/responses \\\n    -H \'Content-Type: application/json\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "model": "gpt-5.1",\n          "prompt_cache_key": "prompt-cache-key-1234",\n          "safety_identifier": "safety-identifier-1234",\n          "temperature": 1,\n          "top_p": 1,\n          "user": "user-1234"\n        }\'',
+          'curl https://api.openai.com/v1/responses \\\n    -H \'Content-Type: application/json\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "model": "gpt-5.1",\n          "prompt_cache_key": "prompt-cache-key-1234",\n          "safety_identifier": "safety-identifier-1234",\n          "user": "user-1234"\n        }\'',
       },
     },
   },
@@ -2807,7 +2807,7 @@ const EMBEDDED_METHODS: MethodEntry[] = [
       },
       http: {
         example:
-          'curl https://api.openai.com/v1/responses/compact \\\n    -H \'Content-Type: application/json\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "model": "gpt-5.2",\n          "previous_response_id": "resp_123"\n        }\'',
+          'curl https://api.openai.com/v1/responses/compact \\\n    -H \'Content-Type: application/json\' \\\n    -H "Authorization: Bearer $OPENAI_API_KEY" \\\n    -d \'{\n          "model": "gpt-5.2"\n        }\'',
       },
     },
   },
