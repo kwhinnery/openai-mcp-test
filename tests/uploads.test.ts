@@ -1,7 +1,6 @@
 import fs from 'fs';
 import type { ResponseLike } from 'openai-mcp-test/internal/to-file';
 import { toFile } from 'openai-mcp-test/core/uploads';
-import { File } from 'node:buffer';
 
 class MyClass {
   name: string = 'foo';
