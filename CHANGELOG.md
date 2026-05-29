@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.3.0 (2026-05-29)
+
+Full Changelog: [v0.2.0...v0.3.0](https://github.com/kwhinnery/openai-mcp-test/compare/v0.2.0...v0.3.0)
+
+### Features
+
+* support setting headers via env ([65de563](https://github.com/kwhinnery/openai-mcp-test/commit/65de563d136151a0bace55490c8643422042b0e6))
+
+
+### Bug Fixes
+
+* **mcp:** use `pure-lockfile` when building mcp server ([58628d9](https://github.com/kwhinnery/openai-mcp-test/commit/58628d90476d9e98213c65be3961d5df360aba18))
+* **typescript:** upgrade tsc-multi so that it works with Node 26 ([835ffef](https://github.com/kwhinnery/openai-mcp-test/commit/835ffef7128ea72ebcbeb361d722fe83f88ef555))
+
+
+### Chores
+
+* avoid formatting file that gets changed during releases ([50e9607](https://github.com/kwhinnery/openai-mcp-test/commit/50e9607e76360474144a41584d28f7a3f061ea0c))
+* **ci:** remove release-doctor workflow ([7d63d06](https://github.com/kwhinnery/openai-mcp-test/commit/7d63d06500f05a2b2b62eead1da0c0badcd498b8))
+* fix example snippet imports ([2370128](https://github.com/kwhinnery/openai-mcp-test/commit/2370128b4b37da444e4940ab6d84a0d978614fd9))
+* **format:** run eslint and prettier separately ([90cc46a](https://github.com/kwhinnery/openai-mcp-test/commit/90cc46a15d3a242fea0e24835232e6545b1fd41a))
+* **internal:** codegen related update ([216d46c](https://github.com/kwhinnery/openai-mcp-test/commit/216d46ce46127877d45b89f54239941cc7c70d0b))
+* **internal:** codegen related update ([54cfb4e](https://github.com/kwhinnery/openai-mcp-test/commit/54cfb4e74fc7cfc44bc07ebb87d7c934f086961d))
+* **internal:** codegen related update ([c21188f](https://github.com/kwhinnery/openai-mcp-test/commit/c21188f7f9e6bc00df4fad0801236d574d68c56e))
+* **internal:** codegen related update ([5e22882](https://github.com/kwhinnery/openai-mcp-test/commit/5e22882f37b5f8d638faec1da1a190a140188a59))
+* **internal:** fix MCP docker image builds in yarn projects ([5faeb33](https://github.com/kwhinnery/openai-mcp-test/commit/5faeb33b2b356e4c25dd8108924416dc6c246456))
+* **internal:** fix MCP server import ordering ([fc350ce](https://github.com/kwhinnery/openai-mcp-test/commit/fc350cea8b2e6f9e9b73a5e24f1de3bdeeb1d580))
+* **internal:** more robust bootstrap script ([addd64f](https://github.com/kwhinnery/openai-mcp-test/commit/addd64f2b9b27514d38fa9574ada98e049a8b2b9))
+* **internal:** show error causes in MCP servers when running in local mode ([ca60aa5](https://github.com/kwhinnery/openai-mcp-test/commit/ca60aa54f418f16d78958c37f3ffbe167216ec73))
+* **internal:** use link instead of file in MCP server package.json files ([a82d974](https://github.com/kwhinnery/openai-mcp-test/commit/a82d97470185f92ce40ac1b03ad9b05c938b71d2))
+* **mcp-server:** increase local docs search result count from 5 to 10 ([2de5fd6](https://github.com/kwhinnery/openai-mcp-test/commit/2de5fd6e509dc36664e5d1581d2d25e6e1b63dc3))
+* **mcp-server:** log client info ([408883e](https://github.com/kwhinnery/openai-mcp-test/commit/408883ef30e66ed7640a64c31fe65ae480c7caaa))
+* redact api-key headers in debug logs ([faf20cf](https://github.com/kwhinnery/openai-mcp-test/commit/faf20cfdeb50756efce12e1ec1fe322e13e80e5f))
+* restructure docs search code ([02b8045](https://github.com/kwhinnery/openai-mcp-test/commit/02b804554f9a7cc541876ab8acc2d336eda488f5))
+* **tests:** bump steady to v0.22.1 ([5c567cd](https://github.com/kwhinnery/openai-mcp-test/commit/5c567cdf84bd692657aeaf102b38bf9d90fc7350))
+* **tests:** remove redundant File import ([10643d9](https://github.com/kwhinnery/openai-mcp-test/commit/10643d9629c55185ce412f3c72821ce67a86cd37))
+
+
+### Documentation
+
+* improve examples ([d7908d0](https://github.com/kwhinnery/openai-mcp-test/commit/d7908d067fd55fa888dfd9655ba42f85f5ae1b69))
+* update http mcp docs ([a8acae6](https://github.com/kwhinnery/openai-mcp-test/commit/a8acae6ef96cd8f9e725410f52fe5e25fbd68470))
+
 ## 0.2.0 (2026-04-02)
 
 Full Changelog: [v0.1.1...v0.2.0](https://github.com/kwhinnery/openai-mcp-test/compare/v0.1.1...v0.2.0)
